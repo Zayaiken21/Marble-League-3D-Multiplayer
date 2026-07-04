@@ -1,7 +1,7 @@
 {
-  "name": "marble-league-3d-multiplayer",
+  "name": "marble-league-3d-render-ready",
   "version": "1.0.0",
-  "description": "3D multiplayer marble racing game for Render",
+  "description": "Render-ready 3D multiplayer marble racing game",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"

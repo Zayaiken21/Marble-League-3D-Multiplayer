@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: marble-league-3d
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
