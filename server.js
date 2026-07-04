@@ -211,6 +211,7 @@ function simulate(room, dt) {
     if (gemIndex > 0 && gemIndex % 2 === 0 && !p.collected[gemIndex]) {
       p.collected[gemIndex] = true;
       p.gems += 1;
+      io.to(room.code).emit("gemCollected", { playerId: p.id, gemIndex, gems: p.gems });
     }
 
     // lava hazard slowdown bands
@@ -331,6 +332,29 @@ io.on("connection", socket => {
     if (!p) return;
     p.input = { steer: Number(input.steer || 0), throttle: Number(input.throttle || 1), boost: !!input.boost };
   });
+  socket.on("returnToLobby", () => {
+    const room = rooms.get(socket.data.roomCode);
+    if (!room) return;
+    const p = room.players.get(socket.id);
+    if (!p || !p.host) return socket.emit("errorMessage", "Only host can start a new game.");
+    room.status = "lobby";
+    room.votingOpen = false;
+    room.selectedMap = null;
+    room.wheel = null;
+    room.finishDeadline = 0;
+    room.resultsSent = false;
+    for (const player of room.players.values()) {
+      player.ready = false;
+      player.mapChoice = null;
+      player.s = 0;
+      player.gems = 0;
+      player.collected = {};
+      player.finished = false;
+      player.finishMs = 0;
+    }
+    emitRoom(room);
+  });
+
   socket.on("leaveRoom", () => {
     const room = rooms.get(socket.data.roomCode);
     if (!room) return;

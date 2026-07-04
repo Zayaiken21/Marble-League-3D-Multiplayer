@@ -1,4 +1,4 @@
-# Marble League 3D — Release Candidate
+# Marble League 3D — Fixed Race Systems
 
 Flat Render/GitHub files:
 
@@ -8,32 +8,19 @@ Flat Render/GitHub files:
 - render.yaml
 - server.js
 
-## Fixed
+## Fixed in this build
 
-- Gems collect with a larger hitbox in offline and multiplayer.
-- Multiplayer gems sync from server to client.
-- First finisher starts a 15 second finish timer for everyone else.
-- Results screen shows placements and gems collected.
-- Race Again, Pick New Map, Shop, and Home buttons appear after race.
-- Host does not see their own lobby in open lobbies.
-- Started games disappear from open lobbies.
-- Joystick left/right corrected.
-- Autoroll remains active and joystick steers the marble.
-- Wider tracks.
-- More distinct map themes: snow, lava, beach, lake, jungle, desert, moon, candy, city, mountain, stadium.
-- Lava obstacles slow racers.
-- Snow has falling snow.
-- Ball skins visually match their names with dynamic effects.
-- Loops have a dedicated visible inside-loop camera.
-
-## Render
-
-Build command:
-```bash
-npm install
-```
-
-Start command:
-```bash
-npm start
-```
+- 15-second finish timer triggers when first player reaches the end.
+- Timer shows at top middle during multiplayer finish countdown.
+- After timer expires, final placements/results show.
+- Race end menu includes Race Again, Pick New Map, Shop, and Home.
+- Leaving a game does not create a new room.
+- Host leaving ends the room cleanly.
+- Open lobbies only show waiting rooms and never show your own room.
+- Joystick steering fixed: swipe/press left moves left, right moves right.
+- Multiplayer gems disappear locally when collected and update immediately.
+- Server still syncs multiplayer gem count.
+- Wider track for more players.
+- Loop camera pulls back farther and frames the whole loop.
+- Themes now generate stronger local scenery: snow, lava, beach, lake, desert, jungle, candy, city, etc.
+- Skins have more distinct materials and effects.
