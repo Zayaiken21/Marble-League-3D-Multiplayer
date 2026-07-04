@@ -1,6 +1,6 @@
-# Marble League 3D — Perfected Render Version
+# Marble League 3D — Sonic Inside Loop Fixed
 
-Flat GitHub/Render format:
+Flat Render/GitHub format:
 
 - README.md
 - index.html
@@ -8,27 +8,17 @@ Flat GitHub/Render format:
 - render.yaml
 - server.js
 
-## Flow
+## Fixed
 
-### Main Menu
-Choose Offline or Multiplayer first.
+- Marbles ride the inside of visible Sonic-style loop rings.
+- Camera pulls back during loops so the loop is visible.
+- Camera returns to normal after the loop.
+- Track pieces are cleaner and do not visually crash through each other as badly.
+- Joystick left/right corrected.
+- Wider visible track surface with rails, gems, glow, and nameplates.
+- Keeps multiplayer lobby, ready sync, map voting, and map wheel flow.
 
-### Offline
-Pick map after choosing Offline. Race AI, collect gems, and use gems in the shop for upgrades/designs.
-
-### Multiplayer
-Create or join a lobby first. No map voting appears until you are inside a lobby and the host opens map voting.
-
-Multiplayer flow:
-1. Create/join lobby.
-2. Host opens map voting.
-3. Everyone chooses a map.
-4. Everyone readies up.
-5. If all maps are the same, the game starts directly.
-6. If maps are different, the wheel spins through selected maps and lands upright on the chosen map.
-7. Race starts synced.
-
-## Render
+## Deploy on Render
 
 Build command:
 

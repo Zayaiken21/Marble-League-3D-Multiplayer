@@ -1,7 +1,7 @@
 {
-  "name": "marble-league-3d-perfected-flow",
-  "version": "2.0.0",
-  "description": "Render-ready 3D marble racing with corrected menus, multiplayer voting, visible racers, gems, shop and music",
+  "name": "marble-league-3d-sonic-inside-loop-fixed",
+  "version": "2.1.0",
+  "description": "Render-ready 3D marble racing with visible Sonic-style inside loops and corrected joystick",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
