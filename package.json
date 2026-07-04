@@ -1,7 +1,7 @@
 {
-  "name": "marble-league-3d-mega-final",
-  "version": "3.0.0",
-  "description": "Render-ready 3D marble racer with fixed multiplayer, gems, scenery, maps, skins, controls and loops",
+  "name": "marble-league-3d-release-candidate",
+  "version": "4.0.0",
+  "description": "Render-ready marble league racer with fixed gems, finish flow, lobbies, controls, map themes, skins, and loop camera",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"

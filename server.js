@@ -6,7 +6,6 @@ const { Server } = require("socket.io");
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: "*" } });
-
 const PORT = process.env.PORT || 3000;
 
 const MAPS = [
@@ -23,6 +22,7 @@ const COLORS = [
 
 const TRACK_LENGTH = 7600;
 const MAX_PLAYERS = 8;
+const FINISH_GRACE_MS = 15000;
 const rooms = new Map();
 
 app.use(express.static(__dirname));
@@ -41,7 +41,9 @@ function makeRoom(code) {
     votingOpen: false,
     selectedMap: null,
     wheel: null,
-    players: new Map()
+    players: new Map(),
+    finishDeadline: 0,
+    resultsSent: false
   };
 }
 function makePlayer(socket, data, host) {
@@ -62,6 +64,7 @@ function makePlayer(socket, data, host) {
     gems: 0,
     collected: {},
     finished: false,
+    finishMs: 0,
     place: 1,
     checkpoint: 0
   };
@@ -78,9 +81,9 @@ function roomPublic(room) {
     }))
   };
 }
-function lobbyList() {
+function lobbyListFor(socketId) {
   return [...rooms.values()]
-    .filter(r => r.status === "lobby" && r.players.size > 0)
+    .filter(r => r.status === "lobby" && r.players.size > 0 && !r.players.has(socketId))
     .map(r => ({
       code: r.code,
       status: r.status,
@@ -89,9 +92,12 @@ function lobbyList() {
       host: [...r.players.values()].find(p => p.host)?.name || "Host"
     }));
 }
+function broadcastLobbyList() {
+  for (const [id, socket] of io.of("/").sockets) socket.emit("lobbyList", lobbyListFor(id));
+}
 function emitRoom(room) {
   io.to(room.code).emit("roomUpdate", roomPublic(room));
-  io.emit("lobbyList", lobbyList());
+  broadcastLobbyList();
 }
 function allHaveMaps(room) {
   return room.players.size > 0 && [...room.players.values()].every(p => MAPS.includes(p.mapChoice));
@@ -106,6 +112,8 @@ function beginRace(room, selectedMap) {
   room.status = "racing";
   room.selectedMap = selectedMap;
   room.wheel = null;
+  room.finishDeadline = 0;
+  room.resultsSent = false;
   const arr = [...room.players.values()];
   arr.forEach((p, i) => {
     p.s = Math.max(0, -i * 16);
@@ -117,11 +125,12 @@ function beginRace(room, selectedMap) {
     p.gems = 0;
     p.collected = {};
     p.finished = false;
+    p.finishMs = 0;
     p.place = 1;
     p.checkpoint = 0;
   });
   io.to(room.code).emit("raceStarted", { room: roomPublic(room), trackLength: TRACK_LENGTH, selectedMap });
-  io.emit("lobbyList", lobbyList());
+  broadcastLobbyList();
 }
 function startSelection(room) {
   if (room.status !== "voting" || !everyoneReady(room)) return false;
@@ -136,7 +145,7 @@ function startSelection(room) {
   room.selectedMap = selectedMap;
   room.wheel = { options, selectedMap, startedAt: Date.now(), durationMs: 4300 };
   io.to(room.code).emit("wheelStarted", roomPublic(room));
-  io.emit("lobbyList", lobbyList());
+  broadcastLobbyList();
   setTimeout(() => beginRace(room, selectedMap), room.wheel.durationMs + 650);
   return true;
 }
@@ -153,8 +162,26 @@ function applyBoost(room, p) {
     }
   }
 }
+function results(room) {
+  return [...room.players.values()]
+    .sort((a, b) => {
+      if (a.finished && b.finished) return a.finishMs - b.finishMs;
+      if (a.finished) return -1;
+      if (b.finished) return 1;
+      return b.s - a.s;
+    })
+    .map((p, i) => ({ id: p.id, name: p.name, color: p.color, place: i + 1, gems: p.gems, progress: Math.floor((p.s / TRACK_LENGTH) * 100), finished: p.finished }));
+}
+function finishRoom(room) {
+  if (room.resultsSent) return;
+  room.resultsSent = true;
+  room.status = "finished";
+  io.to(room.code).emit("raceFinished", { results: results(room), selectedMap: room.selectedMap });
+  broadcastLobbyList();
+}
 function simulate(room, dt) {
   if (room.status !== "racing") return;
+  const now = Date.now();
   for (const p of room.players.values()) {
     if (p.finished) continue;
     p.cooldown = Math.max(0, p.cooldown - dt);
@@ -179,24 +206,31 @@ function simulate(room, dt) {
     p.s += p.speed * dt;
     p.checkpoint = Math.floor((p.s / TRACK_LENGTH) * 14);
 
-    // server synced multiplayer gems
-    const gemIndex = Math.floor(p.s / 180);
-    if (gemIndex > 0 && gemIndex % 3 === 0 && !p.collected[gemIndex]) {
+    // server synced multiplayer gems, generous collection bands
+    const gemIndex = Math.floor(p.s / 130);
+    if (gemIndex > 0 && gemIndex % 2 === 0 && !p.collected[gemIndex]) {
       p.collected[gemIndex] = true;
       p.gems += 1;
+    }
+
+    // lava hazard slowdown bands
+    if (room.selectedMap && room.selectedMap.toLowerCase().includes("volcano") && Math.floor(p.s / 500) % 5 === 0) {
+      p.speed *= 0.985;
     }
 
     if (p.s >= TRACK_LENGTH) {
       p.s = TRACK_LENGTH;
       p.finished = true;
+      p.finishMs = now;
+      if (!room.finishDeadline) {
+        room.finishDeadline = now + FINISH_GRACE_MS;
+        io.to(room.code).emit("finishCountdown", { seconds: 15 });
+      }
     }
   }
   const sorted = [...room.players.values()].sort((a, b) => b.s - a.s);
   sorted.forEach((p, i) => p.place = i + 1);
-  if (room.players.size > 0 && [...room.players.values()].every(p => p.finished)) {
-    room.status = "finished";
-    io.emit("lobbyList", lobbyList());
-  }
+  if ([...room.players.values()].every(p => p.finished) || (room.finishDeadline && now >= room.finishDeadline)) finishRoom(room);
 }
 let lastTick = Date.now();
 setInterval(() => {
@@ -210,6 +244,7 @@ setInterval(() => {
         status: room.status,
         trackLength: TRACK_LENGTH,
         selectedMap: room.selectedMap,
+        finishSecondsLeft: room.finishDeadline ? Math.max(0, Math.ceil((room.finishDeadline - now) / 1000)) : 0,
         players: [...room.players.values()].map(p => ({
           id: p.id, name: p.name, color: p.color, s: p.s, lane: p.lane, speed: p.speed,
           boost: p.boost, cooldown: p.cooldown, gems: p.gems, finished: p.finished,
@@ -223,16 +258,14 @@ setInterval(() => {
 setInterval(() => {
   const now = Date.now();
   for (const [code, room] of rooms) {
-    if (room.players.size === 0 || now - room.createdAt > 1000 * 60 * 60 * 4 || room.status === "finished") {
-      rooms.delete(code);
-    }
+    if (room.players.size === 0 || now - room.createdAt > 1000 * 60 * 60 * 4 || (room.status === "finished" && now - room.createdAt > 1000 * 60 * 8)) rooms.delete(code);
   }
-  io.emit("lobbyList", lobbyList());
+  broadcastLobbyList();
 }, 20000);
 
 io.on("connection", socket => {
-  socket.emit("lobbyList", lobbyList());
-  socket.on("requestLobbies", () => socket.emit("lobbyList", lobbyList()));
+  socket.emit("lobbyList", lobbyListFor(socket.id));
+  socket.on("requestLobbies", () => socket.emit("lobbyList", lobbyListFor(socket.id)));
   socket.on("createRoom", data => {
     const room = makeRoom(makeCode());
     room.players.set(socket.id, makePlayer(socket, data || {}, true));
@@ -261,12 +294,8 @@ io.on("connection", socket => {
     if (!p || !p.host) return socket.emit("errorMessage", "Only host can open map voting.");
     room.status = "voting";
     room.votingOpen = true;
-    for (const player of room.players.values()) {
-      player.ready = false;
-      player.mapChoice = null;
-    }
+    for (const player of room.players.values()) { player.ready = false; player.mapChoice = null; }
     emitRoom(room);
-    io.emit("lobbyList", lobbyList());
   });
   socket.on("setMapChoice", mapChoice => {
     const room = rooms.get(socket.data.roomCode);
@@ -300,11 +329,7 @@ io.on("connection", socket => {
     if (!room || room.status !== "racing") return;
     const p = room.players.get(socket.id);
     if (!p) return;
-    p.input = {
-      steer: Number(input.steer || 0),
-      throttle: Number(input.throttle || 1),
-      boost: !!input.boost
-    };
+    p.input = { steer: Number(input.steer || 0), throttle: Number(input.throttle || 1), boost: !!input.boost };
   });
   socket.on("leaveRoom", () => {
     const room = rooms.get(socket.data.roomCode);
@@ -321,7 +346,7 @@ io.on("connection", socket => {
       socket.data.roomCode = null;
       emitRoom(room);
     }
-    io.emit("lobbyList", lobbyList());
+    broadcastLobbyList();
   });
   socket.on("disconnect", () => {
     const room = rooms.get(socket.data.roomCode);
@@ -336,9 +361,9 @@ io.on("connection", socket => {
       }
       emitRoom(room);
     }
-    io.emit("lobbyList", lobbyList());
+    broadcastLobbyList();
   });
 });
 
 app.get("*", (_req, res) => res.sendFile(path.join(__dirname, "index.html")));
-server.listen(PORT, () => console.log(`Marble League Mega Final running on ${PORT}`));
+server.listen(PORT, () => console.log(`Marble League Release Candidate running on ${PORT}`));
