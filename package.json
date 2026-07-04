@@ -1,7 +1,7 @@
 {
-  "name": "marble-league-3d-professional-final",
-  "version": "2.2.0",
-  "description": "Final professional Render-ready marble racing game with fixed loops, controls, finish flow, and room ending",
+  "name": "marble-league-3d-mega-final",
+  "version": "3.0.0",
+  "description": "Render-ready 3D marble racer with fixed multiplayer, gems, scenery, maps, skins, controls and loops",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"

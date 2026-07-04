@@ -1,4 +1,4 @@
-# Marble League 3D — Professional Final
+# Marble League 3D — Mega Final
 
 Flat Render/GitHub files:
 
@@ -8,18 +8,22 @@ Flat Render/GitHub files:
 - render.yaml
 - server.js
 
-## Final fixes
+## Final major fixes
 
-- Every loop uses one consistent Sonic-style inside-loop system.
-- The ball visibly rides inside the loop.
-- Loop camera pulls back but stays readable on phone screens.
-- Camera returns smoothly after loops.
-- Joystick left/right corrected.
-- Finish screen includes Race Again, Pick New Map, and Home.
-- Going Home leaves the multiplayer room; if host goes Home, the room ends.
-- Multiplayer still supports lobby join, ready sync, map vote, and wheel only when maps differ.
+- Started/racing/finished rooms are removed from available lobby list.
+- Host Open Map Voting only appears after you create or join a lobby.
+- Finish screen shows collected gems and options: Race Again, Pick New Map, Shop, Home.
+- Multiplayer gems are collected and synced by the server.
+- Joystick left/right fixed for all players.
+- Wider tracks.
+- Better loop camera framing.
+- Smooth ball rolling.
+- Scenery themes: beach, lake, snow, volcano, jungle, city, candy, desert, aurora, moon, etc.
+- 20 maps.
+- 15+ unlockable ball designs.
+- More professional mobile UI.
 
-## Render
+## Render deploy
 
 Build command:
 
