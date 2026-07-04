@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-<title>Marble League 3D Release Candidate</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Marble League 3D Rebuild</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#040612;color:white;font-family:Inter,system-ui,Segoe UI,Arial,sans-serif;touch-action:none}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#040612;color:white;font-family:Inter,system-ui,Arial,sans-serif;touch-action:none}
 canvas{display:block;width:100vw;height:100vh}
 .hidden{display:none!important}
-.screen{position:fixed;inset:0;z-index:20;display:grid;place-items:center;padding:16px;background:radial-gradient(circle at 50% 20%,rgba(41,74,152,.78),rgba(3,5,18,.95) 62%)}
-.card{width:min(1120px,96vw);max-height:94vh;overflow:auto;padding:22px;border-radius:30px;background:rgba(8,12,34,.92);border:1px solid rgba(255,255,255,.16);box-shadow:0 30px 100px rgba(0,0,0,.62);backdrop-filter:blur(14px)}
+.screen{position:fixed;inset:0;z-index:20;display:grid;place-items:center;padding:16px;background:radial-gradient(circle at 50% 15%,#233d80,#050713 66%)}
+.card{width:min(1120px,96vw);max-height:94vh;overflow:auto;padding:22px;border-radius:30px;background:rgba(7,10,30,.92);border:1px solid rgba(255,255,255,.17);box-shadow:0 30px 100px rgba(0,0,0,.65);backdrop-filter:blur(14px)}
 .card:before{content:'';display:block;height:4px;border-radius:999px;background:linear-gradient(90deg,#8dfcff,#7cff9b,#ffd166,#fb4dff);margin-bottom:14px}
 h1{font-size:clamp(34px,8vw,74px);line-height:.92;margin:0 0 10px;text-transform:uppercase;background:linear-gradient(90deg,#8dfcff,#7cff9b,#ffd166,#fb4dff);-webkit-background-clip:text;color:transparent}
 h2{margin:12px 0 8px}
@@ -19,11 +19,10 @@ p{color:#dbe7ff;line-height:1.45}
 .tile{padding:15px;border-radius:22px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);cursor:pointer}
 .tile.selected{outline:3px solid #8dfcff;box-shadow:0 0 34px rgba(141,252,255,.28)}
 .btn,input,select{border:0;border-radius:18px;padding:14px 18px;font-weight:1000}
-.btn{color:#07101e;background:linear-gradient(135deg,#8dfcff,#7cff9b);box-shadow:0 12px 32px rgba(141,252,255,.22);cursor:pointer;transition:transform .12s ease}
-.btn:active{transform:scale(.97)}
+.btn{color:#07101e;background:linear-gradient(135deg,#8dfcff,#7cff9b);box-shadow:0 12px 32px rgba(141,252,255,.22);cursor:pointer}
 .btn.secondary{background:rgba(255,255,255,.1);color:white;border:1px solid rgba(255,255,255,.16);box-shadow:none}
 .btn.warn{background:linear-gradient(135deg,#ffd166,#ff7c7c)}
-.btn:disabled{opacity:.45;filter:grayscale(.8)}
+.btn:disabled{opacity:.45}
 input,select{width:100%;background:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.14);color:white;margin:5px 0}
 .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 .swatches{display:flex;gap:10px;flex-wrap:wrap}
@@ -33,7 +32,7 @@ input,select{width:100%;background:rgba(0,0,0,.22);border:1px solid rgba(255,255
 .hud{position:fixed;inset:0;z-index:8;pointer-events:none}
 .top{position:absolute;top:calc(10px + env(safe-area-inset-top,0px));left:10px;right:10px;display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
 .stats{display:flex;gap:7px;flex-wrap:wrap;max-width:calc(100vw - 74px)}
-.pill{background:rgba(7,11,31,.76);border:1px solid rgba(255,255,255,.16);backdrop-filter:blur(10px);border-radius:999px;padding:9px 11px;font-weight:950;font-size:14px;text-shadow:0 2px 10px rgba(0,0,0,.8)}
+.pill{background:rgba(7,11,31,.78);border:1px solid rgba(255,255,255,.16);backdrop-filter:blur(10px);border-radius:999px;padding:9px 11px;font-weight:950;font-size:14px;text-shadow:0 2px 10px rgba(0,0,0,.8)}
 .pause{pointer-events:auto;width:56px;height:56px;border-radius:20px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.12);color:white;font-size:24px;font-weight:1000}
 .board{position:absolute;right:10px;top:78px;width:250px;max-width:45vw;background:rgba(7,11,31,.78);border:1px solid rgba(255,255,255,.16);border-radius:18px;padding:10px;font-size:13px}
 .controls{position:absolute;left:0;right:0;bottom:calc(14px + env(safe-area-inset-bottom,0px));display:flex;justify-content:space-between;align-items:flex-end;padding:0 14px}
@@ -41,53 +40,50 @@ input,select{width:100%;background:rgba(0,0,0,.22);border:1px solid rgba(255,255
 .stick{position:absolute;left:50%;top:50%;width:68px;height:68px;border-radius:50%;background:rgba(255,255,255,.92);transform:translate(-50%,-50%);box-shadow:0 10px 30px rgba(0,0,0,.35)}
 .boost{pointer-events:auto;width:112px;height:112px;border-radius:50%;border:0;font-size:20px;font-weight:1000;color:#24070b;background:radial-gradient(circle at 32% 25%,#fff,#ffd166 22%,#ff617e 75%);box-shadow:0 0 46px rgba(255,97,126,.45)}
 .boost.cooling{filter:grayscale(.75) brightness(.75);box-shadow:none}
+.finishTimer{position:fixed;top:calc(60px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);z-index:12;background:rgba(255,77,109,.94)}
 .wheelBox{display:grid;place-items:center;margin:18px 0}
 .wheel{width:280px;height:280px;border-radius:50%;display:grid;place-items:center;border:10px solid rgba(255,255,255,.2);background:conic-gradient(#8dfcff,#7cff9b,#ffd166,#fb4dff,#8dfcff);box-shadow:0 0 60px rgba(141,252,255,.28);transition:transform 4.2s cubic-bezier(.12,.86,.12,1)}
-.wheelInner{width:185px;height:185px;border-radius:50%;display:grid;place-items:center;text-align:center;padding:12px;background:rgba(7,11,31,.92);font-weight:1000;transform:rotate(0deg)}
+.wheelInner{width:185px;height:185px;border-radius:50%;display:grid;place-items:center;text-align:center;padding:12px;background:rgba(7,11,31,.92);font-weight:1000}
 .shopItem{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:12px;border-radius:18px;background:rgba(255,255,255,.08);margin:8px 0}
 .slider{accent-color:#8dfcff;width:min(260px,90vw)}
 @media(max-width:740px){.board{display:none}.joystick{width:132px;height:132px}.stick{width:60px;height:60px}.boost{width:100px;height:100px}.pill{font-size:13px;padding:8px 10px}.card{border-radius:24px;padding:17px}}
 </style>
 </head>
 <body>
-<div id="loading" class="screen"><div class="card"><h1>Loading</h1><p id="loadMsg">Loading Release Candidate 3D engine...</p></div></div>
+<div id="loading" class="screen"><div class="card"><h1>Loading</h1><p id="loadMsg">Loading stable HTML 3D engine...</p></div></div>
 
-<div id="menu" class="screen hidden">
-  <div class="card">
-    <h1>Marble League 3D<br>Release Candidate</h1>
-    <p>Fixed finish timer, cleaned multiplayer rooms, reliable gem pickups, corrected controls, wider tracks, improved loop camera, and stronger real map themes.</p>
-    <div class="grid">
-      <div class="tile selected" data-mode="offline"><h2>Offline Race</h2><p>Choose a map, race AI, collect gems, and upgrade.</p></div>
-      <div class="tile" data-mode="online"><h2>Multiplayer</h2><p>Create or join first. Started games disappear from the lobby list.</p></div>
-    </div>
-    <h2>Name</h2><input id="playerName" value="Player" maxlength="16" />
-    <h2>Ball Design</h2><div id="swatches" class="swatches"></div>
-    <div class="row">
-      <button id="musicBtn" class="btn secondary">Music: On</button>
-      <label>Volume <input id="volume" class="slider" type="range" min="0" max="100" value="55"></label>
-      <button id="shopBtn" class="btn secondary">Shop / Upgrades</button>
-    </div>
-    <div id="offlineMapPanel"><h2>Offline Map Choice</h2><div id="maps" class="grid"></div></div>
-    <div class="row" style="margin-top:16px"><button id="startBtn" class="btn">Continue</button><button id="howBtn" class="btn secondary">Instructions</button></div>
-  </div>
+<div id="menu" class="screen hidden"><div class="card">
+<h1>Marble League 3D</h1>
+<p>Stable Render HTML rebuild with multiplayer, gems, 15-second finish timer, wider tracks, real themes, loops, skins and shop.</p>
+<div class="grid">
+<div class="tile selected" data-mode="offline"><h2>Offline Race</h2><p>Pick a map, race AI, collect gems and unlock skins.</p></div>
+<div class="tile" data-mode="online"><h2>Multiplayer</h2><p>Create or join first. Started games disappear.</p></div>
 </div>
+<h2>Name</h2><input id="playerName" value="Player" maxlength="16">
+<h2>Ball Design</h2><div id="swatches" class="swatches"></div>
+<div class="row"><button id="musicBtn" class="btn secondary">Music: On</button><label>Volume <input id="volume" class="slider" type="range" min="0" max="100" value="55"></label><button id="shopBtn" class="btn secondary">Shop / Upgrades</button></div>
+<div id="offlineMapPanel"><h2>Offline Map Choice</h2><div id="maps" class="grid"></div></div>
+<div class="row" style="margin-top:16px"><button id="startBtn" class="btn">Continue</button><button id="howBtn" class="btn secondary">Instructions</button></div>
+</div></div>
 
 <div id="shop" class="screen hidden"><div class="card"><h1>Shop</h1><p>Bank Gems: <b id="bankGems">0</b></p><div id="shopList"></div><button id="shopBackBtn" class="btn secondary">Back</button></div></div>
-<div id="how" class="screen hidden"><div class="card"><h2>Fixes</h2><p>Multiplayer lobbies only show waiting games. Multiplayer gems sync from the server. Every player uses the same corrected joystick direction. Tracks are wider with real scenery themes and more skins.</p><button id="backBtn" class="btn">Back</button></div></div>
+<div id="how" class="screen hidden"><div class="card"><h2>How It Works</h2><p>Autoroll is always on. Use the joystick to steer left/right. Boost gives a burst and can bump nearby players. First finisher starts a 15 second timer, then results appear.</p><button id="backBtn" class="btn">Back</button></div></div>
 
 <div id="online" class="screen hidden"><div class="card">
-<h1>Multiplayer Lobby</h1><h2>Open Waiting Lobbies</h2><div id="lobbyList" class="grid"></div>
-<h2>Create / Join</h2><input id="roomCodeInput" placeholder="Room code to join" maxlength="8" />
+<h1>Multiplayer Lobby</h1>
+<h2>Open Waiting Lobbies</h2><div id="lobbyList" class="grid"></div>
+<h2>Create / Join</h2><input id="roomCodeInput" placeholder="Room code to join" maxlength="8">
 <div class="row"><button id="createRoomBtn" class="btn">Create Lobby</button><button id="joinRoomBtn" class="btn secondary">Join Code</button><button id="refreshBtn" class="btn secondary">Refresh</button><button id="onlineBackBtn" class="btn secondary">Back</button></div>
 <h2 id="roomTitle">Not in room</h2><div id="roomPlayers"></div>
-<div id="votePanel" class="hidden"><h2>Map Vote</h2><p id="voteHelp">Host must open map voting after players join.</p><select id="mapVote"></select><div class="row" style="margin-top:12px"><button id="readyBtn" class="btn secondary">Ready Up</button><button id="startWheelBtn" class="btn warn">Host Start / Spin</button></div></div>
-<div class="row" style="margin-top:12px"><button id="openVoteBtn" class="btn hidden">Host Open Map Voting</button></div><p id="onlineMsg"></p></div></div>
+<div id="votePanel" class="hidden"><h2>Map Vote</h2><p id="voteHelp">Pick a map, ready up, then host starts.</p><select id="mapVote"></select><div class="row" style="margin-top:12px"><button id="readyBtn" class="btn secondary">Ready Up</button><button id="startWheelBtn" class="btn warn">Host Start / Spin</button></div></div>
+<div class="row" style="margin-top:12px"><button id="openVoteBtn" class="btn hidden">Host Open Map Voting</button></div><p id="onlineMsg"></p>
+</div></div>
 
 <div id="wheelScreen" class="screen hidden"><div class="card"><h1>Map Wheel</h1><p>Choosing from player-selected maps.</p><div class="wheelBox"><div id="wheel" class="wheel"><div id="wheelText" class="wheelInner">Spinning...</div></div></div><p id="wheelOptions"></p></div></div>
 <div id="pauseScreen" class="screen hidden"><div class="card"><h2>Paused</h2><div class="row"><button id="resumeBtn" class="btn">Resume</button><button id="quitBtn" class="btn secondary">Quit</button></div></div></div>
 <div id="finishScreen" class="screen hidden"><div class="card"><h1>Race Complete</h1><p id="result"></p><p>Race Gems Collected: <b id="finishGems">0</b></p><div class="row"><button id="raceAgainBtn" class="btn warn">Race Again</button><button id="newMapBtn" class="btn">Pick New Map</button><button id="finishShopBtn" class="btn secondary">Shop</button><button id="homeBtn" class="btn secondary">Home / End Room</button></div></div></div>
 
-<div id="finishTimer" class="pill hidden" style="position:fixed;top:calc(64px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);z-index:12;background:rgba(255,95,95,.9)">Finish timer: 15</div>
+<div id="finishTimer" class="pill finishTimer hidden">Finish timer: 15s</div>
 <div id="hud" class="hud hidden">
 <div class="top"><div class="stats"><div id="place" class="pill">Place: 1/8</div><div id="progress" class="pill">Progress: 0%</div><div id="speed" class="pill">Speed: 0</div><div id="boostText" class="pill">Boost: 100%</div><div id="gemsText" class="pill">Gems: 0</div><div id="checkpoint" class="pill">CP: 0</div></div><button id="pauseBtn" class="pause">Ⅱ</button></div>
 <div class="board"><b>Leaderboard</b><div id="leaderboard"></div></div>
@@ -97,89 +93,760 @@ input,select{width:100%;background:rgba(0,0,0,.22);border:1px solid rgba(255,255
 <script src="/socket.io/socket.io.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 <script>
-const $=id=>document.getElementById(id);
-const MAPS=["Crystal Coast XL","Neon Metro Mega","Sky Factory GP","Jungle Loopway","Volcano Velocity","Arctic Aurora","Beach Breeze Bay","Lake Lantern Run","Snowpeak Sprint","Desert Mirage","Moon Marbleway","Candy Cloud Road","Rainforest Rush","Sunset Harbor","Glacier Glow","Lava Lighthouse","Cyber Speedway","Coral Reef Roll","Mountain Mist","Starlight Stadium"];
-const THEMES=["beach","city","sky","jungle","volcano","snow","beach","lake","snow","desert","moon","candy","jungle","beach","snow","volcano","city","ocean","mountain","stadium"];
-const COLOR_DATA={white:[0xffffff,0xffffff],red:[0xff4d6d,0xff4d6d],blue:[0x64e9ff,0x64e9ff],green:[0x78ff9f,0x78ff9f],gold:[0xffd166,0xffd166],purple:[0xb178ff,0xb178ff],black:[0x050505,0x333333],rainbow:[0xffffff,0xffffff],lightning:[0xffea4d,0xffea4d],ocean:[0x2ad4ff,0x2ad4ff],lava:[0xff3d1f,0xff7a00],snow:[0xdff8ff,0x9ee8ff],galaxy:[0x7d5cff,0xff4dff],emerald:[0x00e083,0x78ff9f],candy:[0xff8ad8,0xffd166],chrome:[0xbfc7d5,0xffffff],sunset:[0xff7b54,0xffd166],toxic:[0xb6ff00,0x78ff00],icefire:[0x7ce8ff,0xff4d35],midnight:[0x111d55,0x64e9ff],pearl:[0xfff5dd,0xffffff],rose:[0xff8faf,0xff4d6d]};
-const SKINS=Object.keys(COLOR_DATA);
-const MAP_DATA=Object.fromEntries(MAPS.map((m,i)=>[m,{theme:[0x64e9ff,0xb178ff,0xffd166,0x78ff9f,0xff614d,0x8dfcff][i%6],accent:[0xffd166,0x64e9ff,0x78ff9f,0xffd166,0xffd166,0xb178ff][i%6],seed:i+1,world:THEMES[i]}]));
-let save=JSON.parse(localStorage.ml3dFixed||'{"gems":0,"speed":0,"handling":0,"boost":0,"skins":["white","red","blue","green","gold","purple","black"]}');
-let socket=null,selfId=null,currentRoom=null,lobbyList=[],selectedMode="offline",selectedColor="white",selectedMap=MAPS[0],selectedRaceMap=MAPS[0];
-let scene,camera,renderer,clock,worldGroup,raceLine=[],dist=[],totalLen=7600,trackWidth=14.0,loopZones=[];
-let racers=[],player,gems=[],running=false,paused=false,finished=false,joy={x:0,y:0},keys={},pendingBoost=false,lastSent=0,lastRaceGems=0;
-let music=true,volume=.55,audio,beat=0;
+(function(){
+"use strict";
 
-function show(id){["loading","menu","shop","how","online","wheelScreen","pauseScreen","finishScreen"].forEach(s=>$(s).classList.add("hidden"));if(id)$(id).classList.remove("hidden")}
-function hud(v){$("hud").classList.toggle("hidden",!v)}
-function cssColor(name){if(name==="rainbow")return"conic-gradient(red,orange,yellow,lime,cyan,blue,violet,red)";if(name==="lightning")return"radial-gradient(circle at 30% 25%,#fff,#ffe86a 28%,#121936 75%)";if(name==="galaxy")return"radial-gradient(circle,#fff,#7d5cff,#111d55)";if(name==="lava")return"radial-gradient(circle,#fff,#ff7a00,#5b0700)";if(name==="chrome")return"radial-gradient(circle at 30% 25%,#fff,#d8e0ee,#444)";return`radial-gradient(circle at 30% 25%,#fff,#${COLOR_DATA[name][0].toString(16).padStart(6,"0")} 36%,#111 115%)`}
-function renderSwatches(){ $("swatches").innerHTML=""; SKINS.forEach(name=>{let locked=!save.skins.includes(name);let b=document.createElement("button");b.className="swatch"+(name===selectedColor?" selected":"");b.style.background=locked?"linear-gradient(135deg,#222,#555)":cssColor(name);b.title=locked?name+" locked":name;b.onclick=()=>{if(locked){renderShop();show("shop");return}selectedColor=name;document.querySelectorAll(".swatch").forEach(x=>x.classList.remove("selected"));b.classList.add("selected")};$("swatches").appendChild(b)})}
-renderSwatches();
-MAPS.forEach((name,i)=>{let d=document.createElement("div");d.className="tile"+(i===0?" selected":"");d.innerHTML=`<h2>${name}</h2><p>${MAP_DATA[name].world.toUpperCase()} world with wide racing lanes, gems, rails, scenery and loops.</p><span class="badge">Map ${i+1}</span>`;d.onclick=()=>{selectedMap=name;document.querySelectorAll("#maps .tile").forEach(x=>x.classList.remove("selected"));d.classList.add("selected")};$("maps").appendChild(d);let opt=document.createElement("option");opt.value=name;opt.textContent=name;$("mapVote").appendChild(opt)});
-document.querySelectorAll("[data-mode]").forEach(t=>t.onclick=()=>{selectedMode=t.dataset.mode;document.querySelectorAll("[data-mode]").forEach(x=>x.classList.remove("selected"));t.classList.add("selected");$("offlineMapPanel").classList.toggle("hidden",selectedMode!=="offline")});
-$("howBtn").onclick=()=>show("how");$("backBtn").onclick=()=>show("menu");$("startBtn").onclick=()=>{startMusic();selectedMode==="online"?openOnline():startOffline(selectedMap)};$("onlineBackBtn").onclick=()=>{endCurrentRoom();show("menu")};$("pauseBtn").onclick=()=>{paused=true;show("pauseScreen")};$("resumeBtn").onclick=()=>{paused=false;show(null)};$("quitBtn").onclick=()=>{running=false;hud(false);show("menu")};
-$("homeBtn").onclick=()=>{endCurrentRoom();running=false;hud(false);show("menu")};$("raceAgainBtn").onclick=()=>{if(selectedMode==="offline")startOffline(selectedRaceMap);else{if(socket&&currentRoom)socket.emit("returnToLobby");show("online")}};else show("online")};$("newMapBtn").onclick=()=>{running=false;hud(false);if(selectedMode==="offline"){show("menu")}else{if(socket&&currentRoom)socket.emit("returnToLobby");show("online")}};hud(false);selectedMode==="offline"?show("menu"):show("online")};
-$("musicBtn").onclick=()=>{music=!music;$("musicBtn").textContent="Music: "+(music?"On":"Off");startMusic()};$("volume").oninput=e=>{volume=+e.target.value/100;if(audio)audio.gain.gain.value=.06*volume};$("shopBtn").onclick=()=>{renderShop();show("shop")};$("shopBackBtn").onclick=()=>{renderSwatches();show("menu")};$("finishShopBtn").onclick=()=>{renderShop();show("shop")};
-function renderShop(){localStorage.ml3dFixed=JSON.stringify(save);$("bankGems").textContent=save.gems;let items=[["speed","Speed Upgrade",10],["handling","Handling Upgrade",10],["boost","Boost Recharge",10],...SKINS.filter(s=>!save.skins.includes(s)).map(s=>["skin:"+s,"Unlock "+s,18])];$("shopList").innerHTML=items.map(([key,label,cost])=>`<div class="shopItem"><div><b>${label}</b><br><span class="badge">Cost ${cost}</span></div><button class="btn secondary" onclick="buyShop('${key}',${cost})">Buy</button></div>`).join("")||"<p>Everything unlocked.</p>"}
-window.buyShop=(key,cost)=>{if(save.gems<cost)return;if(key.startsWith("skin:"))save.skins.push(key.split(":")[1]);else save[key]++;save.gems-=cost;renderShop();renderSwatches()};
+const $ = id => document.getElementById(id);
 
-function connectSocket(){if(socket)return;socket=io();socket.on("connect",()=>{$("onlineMsg").textContent="Connected.";socket.emit("requestLobbies")});socket.on("errorMessage",msg=>$("onlineMsg").textContent=msg);socket.on("roomClosed",msg=>{currentRoom=null;selfId=null;running=false;hud(false);$("roomTitle").textContent="Not in room";$("roomPlayers").innerHTML="";$("openVoteBtn").classList.add("hidden");$("votePanel").classList.add("hidden");show("online");$("onlineMsg").textContent=msg});socket.on("lobbyList",list=>{lobbyList=list||[];renderLobbyList()});socket.on("joinedRoom",data=>{selfId=data.selfId;currentRoom=data.room;renderRoom()});socket.on("roomUpdate",room=>{currentRoom=room;renderRoom()});socket.on("mapChosenDirect",data=>{show("wheelScreen");$("wheelText").textContent=data.selectedMap;$("wheelOptions").textContent="Everyone picked the same map. No wheel needed."});socket.on("wheelStarted",room=>{currentRoom=room;showWheel(room)});socket.on("raceStarted",data=>{currentRoom=data.room;selectedRaceMap=data.selectedMap;startOnlineRace(selectedRaceMap)});socket.on("raceState",state=>{if(running&&selectedMode==="online")applyOnlineState(state)});socket.on("finishCountdown",d=>{showFinishTimer(d.seconds||15)});socket.on("gemCollected",d=>{handleRemoteGem(d)});socket.on("raceFinished",data=>{hideFinishTimer();showResults(data.results||[])})}
-function openOnline(){connectSocket();$("openVoteBtn").classList.add("hidden");$("votePanel").classList.add("hidden");show("online")}
-function endCurrentRoom(){if(socket&&currentRoom){socket.emit("leaveRoom")}currentRoom=null;selfId=null;$("roomTitle").textContent="Not in room";$("roomPlayers").innerHTML="";$("openVoteBtn").classList.add("hidden");$("votePanel").classList.add("hidden");$("roomCodeInput").value=""}
-function payload(){return{name:$("playerName").value||"Player",color:selectedColor,code:$("roomCodeInput").value.trim().toUpperCase()}}
-$("createRoomBtn").onclick=()=>{connectSocket();socket.emit("createRoom",payload())};$("joinRoomBtn").onclick=()=>{connectSocket();socket.emit("joinRoom",payload())};$("refreshBtn").onclick=()=>socket&&socket.emit("requestLobbies");$("openVoteBtn").onclick=()=>socket&&socket.emit("openMapVote");$("readyBtn").onclick=()=>socket&&socket.emit("setReady",true);$("startWheelBtn").onclick=()=>socket&&socket.emit("startWheel");$("mapVote").onchange=()=>{if(socket&&currentRoom&&currentRoom.votingOpen)socket.emit("setMapChoice",$("mapVote").value)};
-function renderLobbyList(){$("lobbyList").innerHTML=lobbyList.length?lobbyList.map(l=>`<div class="tile"><h2>${l.code}</h2><p>Host: ${l.host}<br>Players: ${l.players}/${l.maxPlayers}<br>Status: waiting</p><button class="btn secondary" onclick="joinListed('${l.code}')">Join</button></div>`).join(""):`<p>No waiting lobbies yet.</p>`}
-window.joinListed=code=>{$("roomCodeInput").value=code;connectSocket();socket.emit("joinRoom",payload())};
-function renderRoom(){if(!currentRoom)return;$("roomTitle").textContent=`Room ${currentRoom.code} · ${currentRoom.status}`;$("openVoteBtn").classList.toggle("hidden",!currentRoom||currentRoom.status!=="lobby");$("votePanel").classList.toggle("hidden",!currentRoom.votingOpen);$("openVoteBtn").disabled=currentRoom.votingOpen||currentRoom.status!=="lobby";$("voteHelp").textContent=currentRoom.votingOpen?"Pick a map, ready up, then host starts. If everyone picked the same map, no wheel appears.":"Host opens voting after players join.";$("roomPlayers").innerHTML=currentRoom.players.map(p=>`<span class="badge">${p.host?"👑 ":""}${p.name} · ${p.color} · ${p.mapChoice||"No map"} ${p.ready?"✅":"⏳"}</span>`).join("");let me=currentRoom.players.find(p=>p.id===selfId);if(me&&me.mapChoice)$("mapVote").value=me.mapChoice}
-function showWheel(room){show("wheelScreen");$("wheelOptions").textContent="Selected maps: "+room.wheel.options.join(" · ");$("wheelText").textContent="Spinning...";$("wheel").style.transition="none";$("wheel").style.transform="rotate(0deg)";setTimeout(()=>{$("wheel").style.transition="transform 4.2s cubic-bezier(.12,.86,.12,1)";$("wheel").style.transform="rotate(1800deg)"},50);setTimeout(()=>{$("wheelText").textContent=room.wheel.selectedMap},3600)}
+const MAPS = [
+  "Crystal Coast XL","Neon Metro Mega","Sky Factory GP","Jungle Loopway","Volcano Velocity",
+  "Arctic Aurora","Beach Breeze Bay","Lake Lantern Run","Snowpeak Sprint","Desert Mirage",
+  "Moon Marbleway","Candy Cloud Road","Rainforest Rush","Sunset Harbor","Glacier Glow",
+  "Lava Lighthouse","Cyber Speedway","Coral Reef Roll","Mountain Mist","Starlight Stadium"
+];
 
-function init3D(){scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0x050711,.006);camera=new THREE.PerspectiveCamera(64,innerWidth/innerHeight,.1,4500);renderer=new THREE.WebGLRenderer({antialias:false,powerPreference:"high-performance"});renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.35));renderer.setSize(innerWidth,innerHeight);document.body.appendChild(renderer.domElement);clock=new THREE.Clock();scene.add(new THREE.AmbientLight(0xffffff,1.45));let sun=new THREE.DirectionalLight(0xffffff,2.5);sun.position.set(60,90,35);scene.add(sun);createStars();addEventListener("resize",()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});show("menu");animate()}
-function createStars(){let geo=new THREE.SphereGeometry(.35,6,6),mat=new THREE.MeshBasicMaterial({color:0xffffff});for(let i=0;i<260;i++){let s=new THREE.Mesh(geo,mat);s.position.set((Math.random()-.5)*1800,Math.random()*420-80,(Math.random()-.5)*1800);scene.add(s)}}
-function clearWorld(){if(worldGroup)scene.remove(worldGroup);worldGroup=new THREE.Group();scene.add(worldGroup);racers=[];gems=[];loopZones=[]}
-function mat(color,em=.45){return new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:em,metalness:.22,roughness:.35})}
-function buildPath(seed){let pts=[],pos=new THREE.Vector3(0,0,0),heading=0,loops=[];const push=v=>pts.push(v.clone()),dir=()=>new THREE.Vector3(Math.sin(heading),0,-Math.cos(heading));function straight(len,steps,climb=0,wave=0){for(let i=1;i<=steps;i++){let t=i/steps,p=pos.clone().add(dir().multiplyScalar(len*t));p.y+=climb*t+Math.sin(t*Math.PI*2)*wave;push(p)}pos=pts[pts.length-1].clone()}function turn(angle,r,steps,climb=0){let start=heading;for(let i=1;i<=steps;i++){heading=start+angle*i/steps;let p=pos.clone().add(dir().multiplyScalar(r/steps));p.y+=climb/steps;push(p);pos=p.clone()}}function flatLoop(radius,steps){let loopStartIndex=pts.length;let base=pos.clone(),f=dir();for(let i=1;i<=steps;i++){let t=i/steps;push(base.clone().add(f.clone().multiplyScalar(radius*2*t)))}pos=pts[pts.length-1].clone();loops.push({index:loopStartIndex,radius,heading})}push(pos);let mul=1+(seed%5)*.035;straight(380*mul,90,14,8);turn(Math.PI*(.28+(seed%5)*.025),230,90,8);straight(430*mul,100,-6,12);flatLoop(58+(seed%5)*2,82);straight(470*mul,110,20,16);turn(-Math.PI*(.42+(seed%4)*.02),250,105,-8);straight(500*mul,120,0,14);turn(Math.PI*.30,190,78,4);straight(450*mul,108,-14,12);flatLoop(64+(seed%4)*2,86);straight(520*mul,125,5,10);return{pts,loops}}
-function computeDist(){dist=[0];totalLen=0;for(let i=1;i<raceLine.length;i++){totalLen+=raceLine[i].distanceTo(raceLine[i-1]);dist.push(totalLen)}}
-function sampleAt(s){s=Math.max(0,Math.min(totalLen,s));let lo=0,hi=dist.length-1;while(lo<hi){let mid=(lo+hi)>>1;if(dist[mid]<s)lo=mid+1;else hi=mid}let i=Math.max(1,lo),a=raceLine[i-1],b=raceLine[i],span=dist[i]-dist[i-1]||1,t=(s-dist[i-1])/span;return a.clone().lerp(b,t)}
-function tangentAt(s){return sampleAt(Math.min(totalLen,s+4)).sub(sampleAt(Math.max(0,s-4))).normalize()}
-function sideAt(s){let t=tangentAt(s),up=new THREE.Vector3(0,1,0),side=new THREE.Vector3().crossVectors(up,t);if(side.length()<.05)side.set(1,0,0);return side.normalize()}
-function makeScenery(world){let palette={beach:[0xffd18a,0x2a8bd6],lake:[0x1468a8,0x8dfcff],snow:[0xdff8ff,0xffffff],volcano:[0x5b130e,0xff3300],jungle:[0x0b6b3a,0x78ff9f],desert:[0xd6a85c,0xffd166],moon:[0x777777,0xcccccc],candy:[0xff8ad8,0x8dfcff],city:[0x202a46,0x64e9ff],ocean:[0x0f7999,0x2ad4ff],mountain:[0x52616b,0xaee2ff],stadium:[0x26314f,0xffd166],sky:[0x4466aa,0xffffff]};let p=palette[world]||palette.beach;scene.background=new THREE.Color(p[0]);scene.fog.color=new THREE.Color(p[0]);let ground=new THREE.Mesh(new THREE.CircleGeometry(1800,80),new THREE.MeshStandardMaterial({color:p[0],emissive:p[0],emissiveIntensity:.12,roughness:.9}));ground.rotation.x=-Math.PI/2;ground.position.y=-12;worldGroup.add(ground);
-for(let i=0;i<130;i++){let geo;if(world==="city")geo=new THREE.BoxGeometry(8,20+Math.random()*70,8);else if(world==="lake"||world==="beach"||world==="ocean")geo=new THREE.CylinderGeometry(2,4,16,7);else if(world==="candy")geo=new THREE.SphereGeometry(5,12,12);else geo=new THREE.ConeGeometry(8,28,8);let matx=new THREE.MeshStandardMaterial({color:p[i%2],emissive:world==="volcano"?0xff3300:p[1],emissiveIntensity:world==="volcano"?.65:.08,roughness:.8});let o=new THREE.Mesh(geo,matx);o.position.set((Math.random()-.5)*1350,world==="city"?10:-3,(Math.random()-.5)*1350);o.scale.setScalar(.7+Math.random()*1.9);worldGroup.add(o)}
-if(world==="snow"){let snowMat=new THREE.MeshBasicMaterial({color:0xffffff});for(let i=0;i<160;i++){let flake=new THREE.Mesh(new THREE.SphereGeometry(.45,6,6),snowMat);flake.position.set((Math.random()-.5)*1000,20+Math.random()*140,(Math.random()-.5)*1000);flake.userData.snow=true;worldGroup.add(flake)}}
-if(world==="volcano"){for(let i=0;i<18;i++){let lava=new THREE.Mesh(new THREE.SphereGeometry(3.5,12,12),new THREE.MeshStandardMaterial({color:0xff3d1f,emissive:0xff3300,emissiveIntensity:1.8}));lava.position.set((Math.random()-.5)*760,5,(Math.random()-.5)*760);lava.userData.lava=true;worldGroup.add(lava)}}}
-function drawRoad(data){let verts=[],idx=[];for(let i=0;i<raceLine.length;i++){let p=raceLine[i],side=sideAt(dist[i]);verts.push(p.x+side.x*trackWidth,p.y+1,p.z+side.z*trackWidth,p.x-side.x*trackWidth,p.y+1,p.z-side.z*trackWidth);if(i<raceLine.length-1){let a=i*2;idx.push(a,a+1,a+2,a+1,a+3,a+2)}}let geo=new THREE.BufferGeometry();geo.setAttribute("position",new THREE.Float32BufferAttribute(verts,3));geo.setIndex(idx);geo.computeVertexNormals();worldGroup.add(new THREE.Mesh(geo,new THREE.MeshStandardMaterial({color:0x182452,emissive:data.theme,emissiveIntensity:.18,metalness:.18,roughness:.44,side:THREE.DoubleSide})))}
-function createLoopVisual(zone,data){let center=sampleAt(zone.startS+zone.len/2),tan=tangentAt(zone.startS),side=sideAt(zone.startS),ringMat=mat(data.accent,1.9);for(let sx of[-1,1]){let pts=[];for(let i=0;i<=128;i++){let th=i/128*Math.PI*2;pts.push(center.clone().add(tan.clone().multiplyScalar(Math.sin(th)*zone.radius)).add(new THREE.Vector3(0,Math.cos(th)*zone.radius+zone.radius+2,0)).add(side.clone().multiplyScalar(sx*trackWidth*.45)))}worldGroup.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts,true),128,.34,8,true),ringMat))}let inside=[];for(let i=0;i<=128;i++){let th=i/128*Math.PI*2;inside.push(center.clone().add(tan.clone().multiplyScalar(Math.sin(th)*zone.radius)).add(new THREE.Vector3(0,Math.cos(th)*zone.radius+zone.radius+2,0)))}worldGroup.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(inside,true),128,trackWidth*.34,14,true),new THREE.MeshStandardMaterial({color:0x111522,emissive:data.theme,emissiveIntensity:.1,transparent:true,opacity:.52,metalness:.2,roughness:.38})))}
-function makeTrack(mapName){let data=MAP_DATA[mapName]||MAP_DATA[MAPS[0]],built=buildPath(data.seed);raceLine=built.pts;computeDist();makeScenery(data.world);drawRoad(data);for(let lp of built.loops){let zone={startS:dist[lp.index]||0,len:lp.radius*2,radius:lp.radius};loopZones.push(zone);createLoopVisual(zone,data)}let railMat=mat(data.theme,1.6);for(let sideMult of[-1,1]){let railPts=raceLine.map((p,i)=>p.clone().add(sideAt(dist[i]).multiplyScalar(sideMult*trackWidth)).add(new THREE.Vector3(0,2.0,0)));worldGroup.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(railPts,false,"catmullrom",.16),1000,.25,8,false),railMat))}createGems();for(let i=0;i<=14;i++){let s=totalLen*i/14,p=sampleAt(s),side=sideAt(s),t=tangentAt(s),g=new THREE.Group(),m=mat(0x78ff9f,1.15);[-1,1].forEach(k=>{let post=new THREE.Mesh(new THREE.BoxGeometry(.55,7,1),m);post.position.copy(p.clone().add(side.clone().multiplyScalar(k*trackWidth*1.02)));post.position.y+=5;g.add(post)});let top=new THREE.Mesh(new THREE.BoxGeometry(trackWidth*2.15,.55,1),m);top.position.copy(p);top.position.y+=8.5;g.add(top);g.lookAt(p.clone().add(t));worldGroup.add(g)}}
-function createGems(){let gemMat=mat(0x78ff9f,2.2),geo=new THREE.OctahedronGeometry(1.8,0);for(let i=6;i<220;i+=3){let s=totalLen*i/225,p=sampleAt(s).add(sideAt(s).multiplyScalar((i%7-3)*2.7));p.y+=4.4;let g=new THREE.Mesh(geo,gemMat);g.position.copy(p);g.userData={s,taken:false,gemIndex:Math.floor(s/130)};worldGroup.add(g);gems.push(g)}}
-function makeLabel(text){let c=document.createElement("canvas");c.width=256;c.height=64;let x=c.getContext("2d");x.fillStyle="rgba(0,0,0,.58)";x.fillRect(8,8,240,48);x.fillStyle="white";x.font="900 24px Arial";x.textAlign="center";x.fillText(text,128,41);let spr=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),transparent:true,depthTest:false}));spr.scale.set(8,2,1);return spr}
-function makeBallMaterial(color){let c=COLOR_DATA[color]||COLOR_DATA.white;if(color==="rainbow"||color==="galaxy"||color==="candy"){let cn=document.createElement("canvas");cn.width=128;cn.height=128;let x=cn.getContext("2d"),gr=x.createLinearGradient(0,0,128,128);let stops=color==="rainbow"?["red","orange","yellow","lime","cyan","blue","violet"]:color==="galaxy"?["#080020","#7d5cff","#ff4dff","#ffffff"]:["#ff8ad8","#ffd166","#8dfcff"];stops.forEach((s,i)=>gr.addColorStop(i/(stops.length-1),s));x.fillStyle=gr;x.fillRect(0,0,128,128);return new THREE.MeshStandardMaterial({map:new THREE.CanvasTexture(cn),emissive:c[1],emissiveIntensity:.55,metalness:.35,roughness:.16})}return new THREE.MeshStandardMaterial({color:c[0],emissive:c[1],emissiveIntensity:color==="black"?.2:.88,metalness:color==="chrome"?.85:.45,roughness:color==="chrome"?.05:.12})}
-function createRacer(id,name,color,isSelf,lane){let c=COLOR_DATA[color]||COLOR_DATA.white,g=new THREE.Group(),material=makeBallMaterial(color);let ball=new THREE.Mesh(new THREE.SphereGeometry(2.1,28,28),material);g.add(ball);if(color==="lightning"||color==="icefire"){let bolt=new THREE.Mesh(new THREE.ConeGeometry(.45,2.2,3),mat(color==="icefire"?0x7ce8ff:0xffff00,1.5));bolt.position.set(.4,.2,1.8);bolt.rotation.z=Math.PI*.15;g.add(bolt)}g.add(new THREE.PointLight(c[1],isSelf?2.7:1.7,24));let label=makeLabel(name);label.position.y=5.2;g.add(label);worldGroup.add(g);let r={id,name,color,isSelf,group:g,ball,label,s:0,lane,speed:25,boost:100,cooldown:0,gems:0,place:1,ai:false,laneVel:0,finished:false,checkpoint:0};racers.push(r);if(isSelf)player=r;return r}
-function startOffline(mapName){startMusic();selectedRaceMap=mapName;clearWorld();makeTrack(mapName);let names=["You","Ruby","Bolt","Mint","Sunny","Violet","Shadow","Prism"],cols=["red","blue","green","gold","purple","black","rainbow"];for(let i=0;i<8;i++){let r=createRacer("ai"+i,names[i],i===0?selectedColor:cols[i-1],i===0,(i-3.5)*1.35);r.ai=i!==0;r.s=-i*16;r.speed=i===0?26+save.speed*1.6:25+Math.random()*4}running=true;paused=false;finished=false;lastRaceGems=0;show(null);hud(true);clock.getDelta()}
-function startOnlineRace(mapName){startMusic();selectedRaceMap=mapName;clearWorld();makeTrack(mapName);currentRoom.players.forEach((p,i)=>createRacer(p.id,p.name,p.color,p.id===selfId,(i-(currentRoom.players.length-1)/2)*1.35));running=true;paused=false;finished=false;lastRaceGems=0;show(null);hud(true);clock.getDelta()}
-let finishTimerInterval=null;
-function showFinishTimer(seconds){let el=$("finishTimer");el.classList.remove("hidden");let left=seconds;el.textContent="Finish timer: "+left+"s";clearInterval(finishTimerInterval);finishTimerInterval=setInterval(()=>{left--;el.textContent="Finish timer: "+Math.max(0,left)+"s";if(left<=0)clearInterval(finishTimerInterval)},1000)}
-function hideFinishTimer(){clearInterval(finishTimerInterval);$("finishTimer").classList.add("hidden")}
-function handleRemoteGem(d){if(!player||d.playerId!==player.id)return;if(d.gems>(player.gems||0)){let add=d.gems-(player.gems||0);save.gems+=add;lastRaceGems+=add;localStorage.ml3dFixed=JSON.stringify(save);player.gems=d.gems}let idx=d.gemIndex||0;gems.forEach(g=>{if(Math.abs((g.userData.gemIndex||0)-idx)<1){g.userData.taken=true;g.visible=false}})}
-function showResults(results){finished=true;running=false;let me=results.find(r=>r.id===selfId)||{};lastRaceGems=me.gems||lastRaceGems;$("result").innerHTML="<b>Final Results</b><br>"+results.map(r=>"#"+r.place+" "+r.name+" · Gems "+r.gems+" · "+r.progress+"%").join("<br>");$("finishGems").textContent=lastRaceGems;show("finishScreen")}
-function applyOnlineState(state){if(state.finishSecondsLeft&&state.finishSecondsLeft>0)showFinishTimer(state.finishSecondsLeft);state.players.forEach(sp=>{let r=racers.find(x=>x.id===sp.id);if(!r)r=createRacer(sp.id,sp.name,sp.color,sp.id===selfId,sp.lane);if(r.isSelf&&sp.gems>(r.gems||0)){let add=sp.gems-(r.gems||0);save.gems+=add;lastRaceGems+=add;localStorage.ml3dFixed=JSON.stringify(save)}Object.assign(r,{s:sp.s,lane:sp.lane,speed:sp.speed,boost:sp.boost,cooldown:sp.cooldown,gems:sp.gems||0,finished:sp.finished,place:sp.place,checkpoint:sp.checkpoint})});if(false&&state.status==="finished"&&!finished){finished=true;running=false;finishRace("Multiplayer race complete.")}}
-function updateOffline(dt){racers.forEach(r=>{if(r.finished)return;r.boost=Math.min(100,r.boost+(10+save.boost)*dt);r.cooldown=Math.max(0,r.cooldown-dt);if(r.isSelf){let steer=(keys.left?1:0)-(keys.right?1:0)-joy.x,throttle=joy.y<-.1?1.15:joy.y>.45?.55:1;r.laneVel+=steer*(10.5+save.handling)*dt;r.laneVel*=Math.pow(.82,dt*8);r.lane+=r.laneVel*dt;r.speed+=29*throttle*dt;r.speed*=Math.pow(.989,dt*60);r.speed=Math.max(18,Math.min(62+save.speed*2,r.speed))}else{let targetLane=Math.sin(performance.now()/1200+r.id.length+r.s*.002)*trackWidth*.45;r.lane+=(targetLane-r.lane)*dt*.55;r.speed+=(31-r.speed)*dt*.7;if(Math.random()<.0015&&r.boost>=100)doLocalBoost(r)}r.s+=r.speed*dt;r.checkpoint=Math.floor(r.s/totalLen*14);if(Math.abs(r.lane)>trackWidth*.95){r.lane=Math.sign(r.lane)*3.2;r.speed=23}collectGems(r);if(r.s>=totalLen){r.s=totalLen;r.finished=true;if(r.isSelf)finishRace("Offline race complete!")}})}
-function loopInfo(s){for(let z of loopZones){if(s>=z.startS&&s<=z.startS+z.len)return z}return null}
-function loopPosition(r){let z=loopInfo(r.s);if(!z)return null;let t=(r.s-z.startS)/z.len,th=Math.PI*2*t-Math.PI/2,center=sampleAt(z.startS+z.len/2),tan=tangentAt(z.startS),side=sideAt(z.startS);let p=center.clone().add(tan.clone().multiplyScalar(Math.sin(th)*z.radius)).add(new THREE.Vector3(0,Math.cos(th)*z.radius+z.radius+2,0)).add(side.clone().multiplyScalar(r.lane*.38));return{p,z,t}}
-function collectGems(r){gems.forEach(g=>{if(g.userData.taken)return;if(Math.abs(r.s-g.userData.s)<24&&g.position.distanceTo(r.group.position)<20){g.userData.taken=true;g.visible=false;if(r.isSelf){r.gems++;save.gems++;lastRaceGems++;localStorage.ml3dFixed=JSON.stringify(save);tone(880,.05)}}})}
-function doLocalBoost(r){if(!r||r.boost<100||r.cooldown>0)return;r.boost=0;r.cooldown=2.2;r.speed+=30+save.speed*2;tone(180,.08,"sawtooth");racers.forEach(o=>{if(o!==r&&Math.abs(o.s-r.s)<44&&Math.abs(o.lane-r.lane)<7){o.lane+=(o.lane>=r.lane?1:-1)*4.4;o.speed*=.58}})}
-function finishRace(msg){finished=true;running=false;let board=[...racers].sort((a,b)=>b.s-a.s);$("result").innerHTML=msg+"<br><br><b>Results</b><br>"+board.map((r,i)=>"#"+(i+1)+" "+r.name+" · Gems "+(r.gems||0)+" · "+Math.min(100,Math.floor(r.s/totalLen*100))+"%").join("<br>");$("finishGems").textContent=lastRaceGems;show("finishScreen")}
-function placeRacers(dt){racers.forEach(r=>{let base=sampleAt(Math.max(0,Math.min(totalLen,r.s))),side=sideAt(r.s),tan=tangentAt(r.s),lp=loopPosition(r);let pos;if(lp){pos=lp.p;r.group.lookAt(pos.clone().add(tan))}else{pos=base.clone().add(side.multiplyScalar(r.lane));pos.y+=4.4;r.group.lookAt(pos.clone().add(tan))}r.group.position.copy(pos);r.ball.rotation.x+=dt*r.speed*.13;r.label.lookAt(camera.position)})}
-function sendInput(){if(selectedMode!=="online"||!socket||!running)return;let now=performance.now();if(now-lastSent<50)return;lastSent=now;socket.emit("input",{steer:Math.max(-1,Math.min(1,(keys.left?1:0)-(keys.right?1:0)-joy.x)),throttle:joy.y<-.1?1.15:joy.y>.45?.55:1,boost:pendingBoost});pendingBoost=false}
-function updateCamera(dt){if(!player)return;let p=player.group.position.clone(),tan=tangentAt(player.s),side=sideAt(player.s),z=loopInfo(player.s);let desired;if(z){let center=sampleAt(z.startS+z.len/2);desired=center.clone().add(side.clone().multiplyScalar(-92)).add(new THREE.Vector3(0,76,0)).add(tan.clone().multiplyScalar(-58));camera.position.lerp(desired,1-Math.pow(.00016,dt));camera.lookAt(center.clone().add(new THREE.Vector3(0,z.radius*1.05,0)))}else{desired=p.clone().add(tan.clone().multiplyScalar(-42)).add(side.clone().multiplyScalar(-player.lane*.08)).add(new THREE.Vector3(0,25,0));camera.position.lerp(desired,1-Math.pow(.00015,dt));camera.lookAt(p.clone().add(tan.clone().multiplyScalar(42)).add(new THREE.Vector3(0,6,0)))}}
-function updateHUD(){if(!player)return;let board=[...racers].sort((a,b)=>b.s-a.s),place=board.indexOf(player)+1;$("place").textContent="Place: "+place+"/"+racers.length;$("progress").textContent="Progress: "+Math.min(100,Math.floor(player.s/totalLen*100))+"%";$("speed").textContent="Speed: "+Math.floor(player.speed||0);$("boostText").textContent="Boost: "+Math.floor(player.boost||0)+"%";$("gemsText").textContent="Gems: "+(player.gems||0);$("checkpoint").textContent="CP: "+Math.min(14,Math.floor(player.s/totalLen*14))+"/14";$("leaderboard").innerHTML=board.map((r,i)=>`${i+1}. ${r.name} · CP ${Math.floor(r.s/totalLen*14)} · ${Math.min(100,Math.floor(r.s/totalLen*100))}%`).join("<br>");$("boostBtn").classList.toggle("cooling",!(player.boost>=100&&player.cooldown<=0))}
-function startMusic(){if(audio||!music)return;try{let ctx=new (AudioContext||webkitAudioContext)(),gain=ctx.createGain();gain.gain.value=.06*volume;gain.connect(ctx.destination);audio={ctx,gain,t:0}}catch(e){}}
-function tone(f,d,type="sine"){if(!music)return;startMusic();if(!audio)return;let o=audio.ctx.createOscillator(),g=audio.ctx.createGain();o.type=type;o.frequency.value=f;g.gain.value=.05*volume;o.connect(g);g.connect(audio.gain);o.start();g.gain.exponentialRampToValueAtTime(.001,audio.ctx.currentTime+d);o.stop(audio.ctx.currentTime+d)}
-function musicTick(dt){if(!music||!audio)return;beat+=dt;if(beat>.32){beat=0;tone(130+Math.random()*120,.04,Math.random()>.5?"square":"sine")}}
-function animate(){requestAnimationFrame(animate);let dt=Math.min(clock?clock.getDelta():.016,.033);musicTick(dt);if(running&&!paused){if(selectedMode==="offline")updateOffline(dt);sendInput();placeRacers(dt);updateCamera(dt);updateHUD()}gems.forEach(g=>{if(g.visible)g.rotation.y+=dt*2.4});if(worldGroup)worldGroup.children.forEach(o=>{if(o.userData.snow){o.position.y-=dt*12;if(o.position.y<-5)o.position.y=120}if(o.userData.lava){o.position.y=3+Math.abs(Math.sin(performance.now()/500+o.position.x))*12}});renderer.render(scene,camera)}
-addEventListener("keydown",e=>{let k=e.key.toLowerCase();if(k===" ")selectedMode==="online"?pendingBoost=true:doLocalBoost(player);if(k==="arrowleft"||k==="a")keys.left=true;if(k==="arrowright"||k==="d")keys.right=true});
-addEventListener("keyup",e=>{let k=e.key.toLowerCase();if(k==="arrowleft"||k==="a")keys.left=false;if(k==="arrowright"||k==="d")keys.right=false});
-$("boostBtn").onclick=()=>selectedMode==="online"?pendingBoost=true:doLocalBoost(player);
-const joyEl=$("joy"),stick=$("stick");let joyActive=false,joyRect;function setJoy(e){let rawX=e.clientX-(joyRect.left+joyRect.width/2),rawY=e.clientY-(joyRect.top+joyRect.height/2),r=joyRect.width*.38,d=Math.hypot(rawX,rawY),x=rawX,y=rawY;if(d>r){x=x/d*r;y=y/d*r}joy.x=x/r;joy.y=y/r;stick.style.transform=`translate(calc(-50% + ${x}px),calc(-50% + ${y}px))`}joyEl.addEventListener("pointerdown",e=>{joyActive=true;joyRect=joyEl.getBoundingClientRect();joyEl.setPointerCapture(e.pointerId);setJoy(e);startMusic()});joyEl.addEventListener("pointermove",e=>{if(joyActive)setJoy(e)});function resetJoy(){joyActive=false;joy.x=0;joy.y=0;stick.style.transform="translate(-50%,-50%)"}joyEl.addEventListener("pointerup",resetJoy);joyEl.addEventListener("pointercancel",resetJoy);
-function startEngine(){if(typeof THREE==="undefined"){$("loadMsg").textContent="Three.js failed to load. Check internet or deploy on Render.";return}init3D()}
-setTimeout(startEngine,300);
+const WORLDS = ["coast","city","sky","jungle","volcano","snow","beach","lake","snow","desert","moon","candy","jungle","harbor","snow","lava","city","ocean","mountain","stadium"];
+const SKINS = ["white","red","blue","green","gold","purple","black","rainbow","lightning","ocean","lava","snow","galaxy","emerald","candy","chrome","sunset","toxic","icefire","midnight","pearl","rose"];
+const COLORS = {
+  white:[0xffffff,0xffffff], red:[0xff4d6d,0xff4d6d], blue:[0x64e9ff,0x64e9ff], green:[0x78ff9f,0x78ff9f],
+  gold:[0xffd166,0xffd166], purple:[0xb178ff,0xb178ff], black:[0x050505,0x333333], rainbow:[0xffffff,0xffffff],
+  lightning:[0xffea4d,0xffea4d], ocean:[0x2ad4ff,0x2ad4ff], lava:[0xff3d1f,0xff7a00], snow:[0xdff8ff,0x9ee8ff],
+  galaxy:[0x7d5cff,0xff4dff], emerald:[0x00e083,0x78ff9f], candy:[0xff8ad8,0xffd166], chrome:[0xbfc7d5,0xffffff],
+  sunset:[0xff7b54,0xffd166], toxic:[0xb6ff00,0x78ff00], icefire:[0x7ce8ff,0xff4d35], midnight:[0x111d55,0x64e9ff],
+  pearl:[0xfff5dd,0xffffff], rose:[0xff8faf,0xff4d6d]
+};
+
+const MAP_DATA = Object.fromEntries(MAPS.map((m,i)=>[m,{seed:i+1,world:WORLDS[i],theme:[0x64e9ff,0xb178ff,0xffd166,0x78ff9f,0xff614d,0x8dfcff][i%6],accent:[0xffd166,0x64e9ff,0x78ff9f,0xffd166,0xffd166,0xb178ff][i%6]}]));
+
+let save = JSON.parse(localStorage.ml3dStable || '{"gems":0,"speed":0,"handling":0,"boost":0,"skins":["white","red","blue","green","gold","purple","black"]}');
+let selectedMode = "offline";
+let selectedSkin = "white";
+let selectedMap = MAPS[0];
+let selectedRaceMap = MAPS[0];
+
+let socket = null, selfId = null, currentRoom = null;
+let scene, camera, renderer, clock, worldGroup;
+let raceLine = [], dist = [], totalLen = 7600, trackWidth = 14, loopZones = [];
+let racers = [], player = null, gems = [];
+let running = false, paused = false, finished = false;
+let joy = {x:0,y:0}, keys = {}, pendingBoost = false, lastSent = 0, lastRaceGems = 0;
+let music = true, volume = .55, audio = null, beat = 0, finishTimerInterval = null;
+
+function show(id){
+  ["loading","menu","shop","how","online","wheelScreen","pauseScreen","finishScreen"].forEach(s=>$(s).classList.add("hidden"));
+  if(id) $(id).classList.remove("hidden");
+}
+function hud(v){ $("hud").classList.toggle("hidden", !v); }
+function saveNow(){ localStorage.ml3dStable = JSON.stringify(save); }
+
+function cssSkin(name){
+  if(name==="rainbow") return "conic-gradient(red,orange,yellow,lime,cyan,blue,violet,red)";
+  if(name==="galaxy") return "radial-gradient(circle,#fff,#7d5cff,#111d55)";
+  if(name==="lightning") return "radial-gradient(circle,#fff,#ffe86a,#111)";
+  if(name==="lava") return "radial-gradient(circle,#fff,#ff7a00,#5b0700)";
+  if(name==="chrome") return "radial-gradient(circle,#fff,#ccd3dd,#444)";
+  const c = COLORS[name] || COLORS.white;
+  return `radial-gradient(circle at 30% 25%,#fff,#${c[0].toString(16).padStart(6,"0")} 36%,#111 115%)`;
+}
+
+function renderSwatches(){
+  $("swatches").innerHTML = "";
+  SKINS.forEach(name=>{
+    const locked = !save.skins.includes(name);
+    const b = document.createElement("button");
+    b.className = "swatch" + (name===selectedSkin ? " selected" : "");
+    b.style.background = locked ? "linear-gradient(135deg,#222,#555)" : cssSkin(name);
+    b.title = locked ? `${name} locked` : name;
+    b.onclick = () => {
+      if(locked){ renderShop(); show("shop"); return; }
+      selectedSkin = name;
+      renderSwatches();
+    };
+    $("swatches").appendChild(b);
+  });
+}
+
+function renderMaps(){
+  $("maps").innerHTML = "";
+  $("mapVote").innerHTML = "";
+  MAPS.forEach((name,i)=>{
+    const d = document.createElement("div");
+    d.className = "tile" + (name===selectedMap ? " selected" : "");
+    d.innerHTML = `<h2>${name}</h2><p>${MAP_DATA[name].world.toUpperCase()} theme with wide lanes, gems, scenery and loops.</p><span class="badge">Map ${i+1}</span>`;
+    d.onclick = () => { selectedMap = name; renderMaps(); };
+    $("maps").appendChild(d);
+    const opt = document.createElement("option");
+    opt.value = name;
+    opt.textContent = name;
+    $("mapVote").appendChild(opt);
+  });
+}
+
+function renderShop(){
+  $("bankGems").textContent = save.gems;
+  const items = [
+    ["speed","Speed Upgrade",10],["handling","Handling Upgrade",10],["boost","Boost Recharge",10],
+    ...SKINS.filter(s=>!save.skins.includes(s)).map(s=>["skin:"+s,"Unlock "+s,18])
+  ];
+  $("shopList").innerHTML = items.length ? items.map(([key,label,cost])=>`
+    <div class="shopItem"><div><b>${label}</b><br><span class="badge">Cost ${cost}</span></div><button class="btn secondary" onclick="buyShop('${key}',${cost})">Buy</button></div>
+  `).join("") : "<p>Everything unlocked.</p>";
+}
+window.buyShop = function(key,cost){
+  if(save.gems < cost) return;
+  save.gems -= cost;
+  if(key.startsWith("skin:")) save.skins.push(key.split(":")[1]);
+  else save[key] = (save[key] || 0) + 1;
+  saveNow(); renderShop(); renderSwatches();
+};
+
+document.querySelectorAll("[data-mode]").forEach(t=>t.onclick=()=>{
+  selectedMode = t.dataset.mode;
+  document.querySelectorAll("[data-mode]").forEach(x=>x.classList.remove("selected"));
+  t.classList.add("selected");
+  $("offlineMapPanel").classList.toggle("hidden", selectedMode !== "offline");
+});
+
+$("howBtn").onclick = () => show("how");
+$("backBtn").onclick = () => show("menu");
+$("shopBtn").onclick = () => { renderShop(); show("shop"); };
+$("shopBackBtn").onclick = () => show("menu");
+$("finishShopBtn").onclick = () => { renderShop(); show("shop"); };
+$("startBtn").onclick = () => { startMusic(); selectedMode==="online" ? openOnline() : startOffline(selectedMap); };
+$("onlineBackBtn").onclick = () => { endCurrentRoom(); show("menu"); };
+$("pauseBtn").onclick = () => { paused = true; show("pauseScreen"); };
+$("resumeBtn").onclick = () => { paused = false; show(null); };
+$("quitBtn").onclick = () => { running = false; hud(false); show("menu"); };
+$("homeBtn").onclick = () => { endCurrentRoom(); running=false; hud(false); show("menu"); };
+$("raceAgainBtn").onclick = () => {
+  if(selectedMode==="offline") startOffline(selectedRaceMap);
+  else { if(socket && currentRoom) socket.emit("returnToLobby"); show("online"); }
+};
+$("newMapBtn").onclick = () => {
+  running=false; hud(false);
+  if(selectedMode==="offline") show("menu");
+  else { if(socket && currentRoom) socket.emit("returnToLobby"); show("online"); }
+};
+$("musicBtn").onclick = () => { music = !music; $("musicBtn").textContent = "Music: " + (music ? "On" : "Off"); startMusic(); };
+$("volume").oninput = e => { volume = +e.target.value/100; if(audio) audio.gain.gain.value = .06 * volume; };
+
+function connectSocket(){
+  if(socket) return;
+  socket = io();
+  socket.on("connect",()=>{ $("onlineMsg").textContent="Connected."; socket.emit("requestLobbies"); });
+  socket.on("errorMessage",msg=>$("onlineMsg").textContent=msg);
+  socket.on("roomClosed",msg=>{
+    currentRoom=null; selfId=null; running=false; hud(false); resetRoomUI(); show("online"); $("onlineMsg").textContent=msg;
+  });
+  socket.on("lobbyList", renderLobbyList);
+  socket.on("joinedRoom", data=>{ selfId=data.selfId; currentRoom=data.room; renderRoom(); });
+  socket.on("roomUpdate", room=>{ currentRoom=room; renderRoom(); });
+  socket.on("mapChosenDirect", data=>{ show("wheelScreen"); $("wheelText").textContent=data.selectedMap; $("wheelOptions").textContent="Everyone picked the same map. No wheel needed."; });
+  socket.on("wheelStarted", room=>{ currentRoom=room; showWheel(room); });
+  socket.on("raceStarted", data=>{ currentRoom=data.room; selectedRaceMap=data.selectedMap; startOnlineRace(selectedRaceMap); });
+  socket.on("raceState", state=>{ if(running && selectedMode==="online") applyOnlineState(state); });
+  socket.on("finishCountdown", data=>showFinishTimer(data.seconds || 15, data.firstFinisher || "Leader"));
+  socket.on("gemCollected", handleRemoteGem);
+  socket.on("raceFinished", data=>{ hideFinishTimer(); showResults(data.results || []); });
+}
+
+function openOnline(){
+  connectSocket();
+  $("openVoteBtn").classList.add("hidden");
+  $("votePanel").classList.add("hidden");
+  show("online");
+}
+
+function resetRoomUI(){
+  $("roomTitle").textContent="Not in room";
+  $("roomPlayers").innerHTML="";
+  $("openVoteBtn").classList.add("hidden");
+  $("votePanel").classList.add("hidden");
+  $("roomCodeInput").value="";
+}
+
+function endCurrentRoom(){
+  if(socket && currentRoom) socket.emit("leaveRoom");
+  currentRoom = null;
+  selfId = null;
+  resetRoomUI();
+}
+
+function payload(){
+  return { name:$("playerName").value || "Player", skin:selectedSkin, code:$("roomCodeInput").value.trim().toUpperCase() };
+}
+
+$("createRoomBtn").onclick = () => { connectSocket(); socket.emit("createRoom", payload()); };
+$("joinRoomBtn").onclick = () => { connectSocket(); socket.emit("joinRoom", payload()); };
+$("refreshBtn").onclick = () => { if(socket) socket.emit("requestLobbies"); };
+$("openVoteBtn").onclick = () => { if(socket) socket.emit("openMapVote"); };
+$("readyBtn").onclick = () => { if(socket) socket.emit("setReady", true); };
+$("startWheelBtn").onclick = () => { if(socket) socket.emit("startWheel"); };
+$("mapVote").onchange = () => { if(socket && currentRoom && currentRoom.votingOpen) socket.emit("setMapChoice", $("mapVote").value); };
+
+function renderLobbyList(list){
+  $("lobbyList").innerHTML = list && list.length ? list.map(l=>`
+    <div class="tile"><h2>${l.code}</h2><p>Host: ${l.host}<br>Players: ${l.players}/${l.maxPlayers}<br>Status: waiting</p><button class="btn secondary" onclick="joinListed('${l.code}')">Join</button></div>
+  `).join("") : "<p>No waiting lobbies yet.</p>";
+}
+window.joinListed = code => { $("roomCodeInput").value = code; connectSocket(); socket.emit("joinRoom", payload()); };
+
+function renderRoom(){
+  if(!currentRoom) return;
+  $("roomTitle").textContent = `Room ${currentRoom.code} · ${currentRoom.status}`;
+  $("openVoteBtn").classList.toggle("hidden", currentRoom.status !== "lobby");
+  $("votePanel").classList.toggle("hidden", !currentRoom.votingOpen);
+  $("roomPlayers").innerHTML = currentRoom.players.map(p=>`<span class="badge">${p.host?"👑 ":""}${p.name} · ${p.skin} · ${p.mapChoice || "No map"} ${p.ready?"✅":"⏳"}</span>`).join("");
+  const me = currentRoom.players.find(p=>p.id===selfId);
+  if(me && me.mapChoice) $("mapVote").value = me.mapChoice;
+}
+
+function showWheel(room){
+  show("wheelScreen");
+  $("wheelOptions").textContent = "Selected maps: " + room.wheel.options.join(" · ");
+  $("wheelText").textContent = "Spinning...";
+  $("wheel").style.transition = "none";
+  $("wheel").style.transform = "rotate(0deg)";
+  setTimeout(()=>{ $("wheel").style.transition = "transform 4.2s cubic-bezier(.12,.86,.12,1)"; $("wheel").style.transform = "rotate(1800deg)"; },50);
+  setTimeout(()=>{ $("wheelText").textContent = room.wheel.selectedMap; },3600);
+}
+
+function showFinishTimer(seconds, first){
+  const el = $("finishTimer");
+  el.classList.remove("hidden");
+  let left = seconds;
+  el.textContent = `${first} finished! ${left}s left`;
+  clearInterval(finishTimerInterval);
+  finishTimerInterval = setInterval(()=>{
+    left--;
+    el.textContent = `${first} finished! ${Math.max(0,left)}s left`;
+    if(left<=0) clearInterval(finishTimerInterval);
+  },1000);
+}
+function hideFinishTimer(){
+  clearInterval(finishTimerInterval);
+  $("finishTimer").classList.add("hidden");
+}
+
+function showResults(results){
+  finished = true;
+  running = false;
+  const me = results.find(r=>r.id===selfId) || {};
+  lastRaceGems = me.gems || lastRaceGems;
+  $("finishGems").textContent = lastRaceGems;
+  $("result").innerHTML = "<b>Final Results</b><br>" + results.map(r=>`#${r.place} ${r.name} · Gems ${r.gems} · ${r.progress}%`).join("<br>");
+  show("finishScreen");
+}
+
+function init3D(){
+  if(typeof THREE === "undefined") throw new Error("Three.js did not load. Check internet/CDN.");
+  scene = new THREE.Scene();
+  scene.fog = new THREE.FogExp2(0x123456,.005);
+  camera = new THREE.PerspectiveCamera(64, innerWidth/innerHeight, .1, 5000);
+  renderer = new THREE.WebGLRenderer({antialias:false, powerPreference:"high-performance"});
+  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.35));
+  renderer.setSize(innerWidth, innerHeight);
+  document.body.appendChild(renderer.domElement);
+  clock = new THREE.Clock();
+  scene.add(new THREE.AmbientLight(0xffffff,1.45));
+  const sun = new THREE.DirectionalLight(0xffffff,2.6);
+  sun.position.set(80,100,40);
+  scene.add(sun);
+  createStars();
+  addEventListener("resize",()=>{ camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth,innerHeight); });
+  show("menu");
+  animate();
+}
+
+function createStars(){
+  const geo = new THREE.SphereGeometry(.35,6,6);
+  const material = new THREE.MeshBasicMaterial({color:0xffffff});
+  for(let i=0;i<220;i++){
+    const s = new THREE.Mesh(geo,material);
+    s.position.set((Math.random()-.5)*1800,Math.random()*420-80,(Math.random()-.5)*1800);
+    scene.add(s);
+  }
+}
+
+function clearWorld(){
+  if(worldGroup) scene.remove(worldGroup);
+  worldGroup = new THREE.Group();
+  scene.add(worldGroup);
+  racers = [];
+  gems = [];
+  loopZones = [];
+}
+
+function material(color, em=.45){
+  return new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:em,metalness:.22,roughness:.35});
+}
+
+function buildPath(seed){
+  let pts=[], pos=new THREE.Vector3(0,0,0), heading=0, loops=[];
+  const push=v=>pts.push(v.clone());
+  const dir=()=>new THREE.Vector3(Math.sin(heading),0,-Math.cos(heading));
+  function straight(len,steps,climb=0,wave=0){
+    for(let i=1;i<=steps;i++){
+      let t=i/steps,p=pos.clone().add(dir().multiplyScalar(len*t));
+      p.y += climb*t + Math.sin(t*Math.PI*2)*wave;
+      push(p);
+    }
+    pos=pts[pts.length-1].clone();
+  }
+  function turn(angle,r,steps,climb=0){
+    let start=heading;
+    for(let i=1;i<=steps;i++){
+      heading=start+angle*i/steps;
+      let p=pos.clone().add(dir().multiplyScalar(r/steps));
+      p.y += climb/steps;
+      push(p); pos=p.clone();
+    }
+  }
+  function loop(radius,steps){
+    let start=pts.length, base=pos.clone(), f=dir();
+    for(let i=1;i<=steps;i++) push(base.clone().add(f.clone().multiplyScalar(radius*2*i/steps)));
+    pos=pts[pts.length-1].clone();
+    loops.push({index:start,radius});
+  }
+  push(pos);
+  let mul=1+(seed%5)*.035;
+  straight(380*mul,90,14,8); turn(Math.PI*(.28+(seed%5)*.025),230,90,8);
+  straight(430*mul,100,-6,12); loop(62+(seed%5)*2,84);
+  straight(470*mul,110,20,16); turn(-Math.PI*(.42+(seed%4)*.02),250,105,-8);
+  straight(500*mul,120,0,14); turn(Math.PI*.30,190,78,4);
+  straight(450*mul,108,-14,12); loop(68+(seed%4)*2,88);
+  straight(520*mul,125,5,10);
+  return {pts,loops};
+}
+
+function computeDistances(){
+  dist=[0]; totalLen=0;
+  for(let i=1;i<raceLine.length;i++){
+    totalLen += raceLine[i].distanceTo(raceLine[i-1]);
+    dist.push(totalLen);
+  }
+}
+
+function sampleAt(s){
+  s=Math.max(0,Math.min(totalLen,s));
+  let lo=0,hi=dist.length-1;
+  while(lo<hi){ let mid=(lo+hi)>>1; if(dist[mid]<s)lo=mid+1; else hi=mid; }
+  let i=Math.max(1,lo), a=raceLine[i-1], b=raceLine[i], span=dist[i]-dist[i-1] || 1, t=(s-dist[i-1])/span;
+  return a.clone().lerp(b,t);
+}
+function tangentAt(s){ return sampleAt(Math.min(totalLen,s+4)).sub(sampleAt(Math.max(0,s-4))).normalize(); }
+function sideAt(s){
+  let t=tangentAt(s), up=new THREE.Vector3(0,1,0), side=new THREE.Vector3().crossVectors(up,t);
+  if(side.length()<.05) side.set(1,0,0);
+  return side.normalize();
+}
+
+function makeScenery(world){
+  const pal = {
+    coast:[0x2a8bd6,0xffd18a], beach:[0xffd18a,0x2a8bd6], lake:[0x1468a8,0x8dfcff], snow:[0xdff8ff,0xffffff],
+    volcano:[0x5b130e,0xff3300], lava:[0x5b130e,0xff3300], jungle:[0x0b6b3a,0x78ff9f], desert:[0xd6a85c,0xffd166],
+    moon:[0x777777,0xcccccc], candy:[0xff8ad8,0x8dfcff], city:[0x202a46,0x64e9ff], ocean:[0x0f7999,0x2ad4ff],
+    mountain:[0x52616b,0xaee2ff], stadium:[0x26314f,0xffd166], sky:[0x4466aa,0xffffff], harbor:[0x0f7999,0xffd166]
+  };
+  const p = pal[world] || pal.coast;
+  scene.background = new THREE.Color(p[0]);
+  scene.fog.color = new THREE.Color(p[0]);
+  const ground = new THREE.Mesh(new THREE.CircleGeometry(1800,72), new THREE.MeshStandardMaterial({color:p[0],emissive:p[0],emissiveIntensity:.12,roughness:.9}));
+  ground.rotation.x=-Math.PI/2;
+  ground.position.y=-12;
+  worldGroup.add(ground);
+
+  for(let i=0;i<100;i++){
+    let geo;
+    if(world==="city") geo = new THREE.BoxGeometry(8,20+Math.random()*70,8);
+    else if(["beach","lake","ocean","harbor"].includes(world)) geo = new THREE.CylinderGeometry(2,4,16,7);
+    else if(world==="candy") geo = new THREE.SphereGeometry(5,12,12);
+    else geo = new THREE.ConeGeometry(8,28,8);
+    const mat = new THREE.MeshStandardMaterial({color:p[i%2],emissive:(world==="volcano"||world==="lava")?0xff3300:p[1],emissiveIntensity:(world==="volcano"||world==="lava")?.65:.08,roughness:.8});
+    const o = new THREE.Mesh(geo,mat);
+    o.position.set((Math.random()-.5)*1350, world==="city"?10:-3, (Math.random()-.5)*1350);
+    o.scale.setScalar(.7+Math.random()*1.9);
+    worldGroup.add(o);
+  }
+
+  if(world==="snow"){
+    const snowMat = new THREE.MeshBasicMaterial({color:0xffffff});
+    for(let i=0;i<140;i++){
+      const flake = new THREE.Mesh(new THREE.SphereGeometry(.45,6,6), snowMat);
+      flake.position.set((Math.random()-.5)*1000,20+Math.random()*140,(Math.random()-.5)*1000);
+      flake.userData.snow = true;
+      worldGroup.add(flake);
+    }
+  }
+  if(world==="volcano" || world==="lava"){
+    for(let i=0;i<18;i++){
+      const lava = new THREE.Mesh(new THREE.SphereGeometry(3.5,12,12), new THREE.MeshStandardMaterial({color:0xff3d1f,emissive:0xff3300,emissiveIntensity:1.8}));
+      lava.position.set((Math.random()-.5)*760,5,(Math.random()-.5)*760);
+      lava.userData.lava = true;
+      worldGroup.add(lava);
+    }
+  }
+}
+
+function drawRoad(data){
+  const verts=[], idx=[];
+  for(let i=0;i<raceLine.length;i++){
+    const p=raceLine[i], side=sideAt(dist[i]);
+    verts.push(p.x+side.x*trackWidth,p.y+1,p.z+side.z*trackWidth,p.x-side.x*trackWidth,p.y+1,p.z-side.z*trackWidth);
+    if(i<raceLine.length-1){ const a=i*2; idx.push(a,a+1,a+2,a+1,a+3,a+2); }
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute("position", new THREE.Float32BufferAttribute(verts,3));
+  geo.setIndex(idx);
+  geo.computeVertexNormals();
+  worldGroup.add(new THREE.Mesh(geo,new THREE.MeshStandardMaterial({color:0x182452,emissive:data.theme,emissiveIntensity:.18,metalness:.18,roughness:.44,side:THREE.DoubleSide})));
+}
+
+function createLoop(zone,data){
+  const center=sampleAt(zone.startS+zone.len/2), tan=tangentAt(zone.startS), side=sideAt(zone.startS);
+  const ringMat = material(data.accent,1.9);
+  for(const sx of [-1,1]){
+    const pts=[];
+    for(let i=0;i<=128;i++){
+      const th=i/128*Math.PI*2;
+      pts.push(center.clone().add(tan.clone().multiplyScalar(Math.sin(th)*zone.radius)).add(new THREE.Vector3(0,Math.cos(th)*zone.radius+zone.radius+2,0)).add(side.clone().multiplyScalar(sx*trackWidth*.45)));
+    }
+    worldGroup.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts,true),128,.38,8,true), ringMat));
+  }
+  const inner=[];
+  for(let i=0;i<=128;i++){
+    const th=i/128*Math.PI*2;
+    inner.push(center.clone().add(tan.clone().multiplyScalar(Math.sin(th)*zone.radius)).add(new THREE.Vector3(0,Math.cos(th)*zone.radius+zone.radius+2,0)));
+  }
+  worldGroup.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(inner,true),128,trackWidth*.36,14,true),new THREE.MeshStandardMaterial({color:0x111522,emissive:data.theme,emissiveIntensity:.12,transparent:true,opacity:.55,metalness:.2,roughness:.38})));
+}
+
+function createGems(){
+  const gemMat = material(0x78ff9f,2.2);
+  const geo = new THREE.OctahedronGeometry(1.8,0);
+  for(let i=6;i<220;i+=3){
+    const s = totalLen*i/225;
+    const p = sampleAt(s).add(sideAt(s).multiplyScalar((i%7-3)*2.7));
+    p.y += 4.4;
+    const g = new THREE.Mesh(geo,gemMat);
+    g.position.copy(p);
+    g.userData = {s,taken:false,gemIndex:Math.floor(s/120)};
+    worldGroup.add(g);
+    gems.push(g);
+  }
+}
+
+function makeTrack(mapName){
+  const data = MAP_DATA[mapName] || MAP_DATA[MAPS[0]];
+  const built = buildPath(data.seed);
+  raceLine = built.pts;
+  computeDistances();
+  makeScenery(data.world);
+  drawRoad(data);
+
+  for(const lp of built.loops){
+    const zone = {startS:dist[lp.index] || 0, len:lp.radius*2, radius:lp.radius};
+    loopZones.push(zone);
+    createLoop(zone,data);
+  }
+
+  const railMat = material(data.theme,1.6);
+  for(const mult of [-1,1]){
+    const pts = raceLine.map((p,i)=>p.clone().add(sideAt(dist[i]).multiplyScalar(mult*trackWidth)).add(new THREE.Vector3(0,2.0,0)));
+    worldGroup.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts,false,"catmullrom",.16),1000,.25,8,false),railMat));
+  }
+  createGems();
+}
+
+function makeBallMaterial(skin){
+  const c = COLORS[skin] || COLORS.white;
+  if(["rainbow","galaxy","candy"].includes(skin)){
+    const canvas=document.createElement("canvas"), x=canvas.getContext("2d");
+    canvas.width=128; canvas.height=128;
+    const gr=x.createLinearGradient(0,0,128,128);
+    const stops = skin==="rainbow" ? ["red","orange","yellow","lime","cyan","blue","violet"] : skin==="galaxy" ? ["#080020","#7d5cff","#ff4dff","#ffffff"] : ["#ff8ad8","#ffd166","#8dfcff"];
+    stops.forEach((s,i)=>gr.addColorStop(i/(stops.length-1),s));
+    x.fillStyle=gr; x.fillRect(0,0,128,128);
+    return new THREE.MeshStandardMaterial({map:new THREE.CanvasTexture(canvas),emissive:c[1],emissiveIntensity:.55,metalness:.35,roughness:.16});
+  }
+  return new THREE.MeshStandardMaterial({color:c[0],emissive:c[1],emissiveIntensity:skin==="black"?.2:.88,metalness:skin==="chrome"?.85:.45,roughness:skin==="chrome"?.05:.12});
+}
+
+function makeLabel(text){
+  const canvas=document.createElement("canvas"), x=canvas.getContext("2d");
+  canvas.width=256; canvas.height=64;
+  x.fillStyle="rgba(0,0,0,.58)"; x.fillRect(8,8,240,48);
+  x.fillStyle="white"; x.font="900 24px Arial"; x.textAlign="center"; x.fillText(text,128,41);
+  const spr = new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(canvas),transparent:true,depthTest:false}));
+  spr.scale.set(8,2,1);
+  return spr;
+}
+
+function createRacer(id,name,skin,isSelf,lane){
+  const c=COLORS[skin]||COLORS.white;
+  const g = new THREE.Group();
+  const ball = new THREE.Mesh(new THREE.SphereGeometry(2.1,28,28), makeBallMaterial(skin));
+  g.add(ball);
+  if(skin==="lightning" || skin==="icefire"){
+    const bolt = new THREE.Mesh(new THREE.ConeGeometry(.45,2.2,3), material(skin==="icefire"?0x7ce8ff:0xffff00,1.5));
+    bolt.position.set(.4,.2,1.8);
+    bolt.rotation.z=Math.PI*.15;
+    g.add(bolt);
+  }
+  g.add(new THREE.PointLight(c[1],isSelf?2.7:1.7,24));
+  const label = makeLabel(name);
+  label.position.y = 5.2;
+  g.add(label);
+  worldGroup.add(g);
+  const r = {id,name,skin,isSelf,group:g,ball,label,s:0,lane,speed:25,boost:100,cooldown:0,gems:0,place:1,ai:false,laneVel:0,finished:false,checkpoint:0};
+  racers.push(r);
+  if(isSelf) player = r;
+  return r;
+}
+
+function startOffline(mapName){
+  startMusic();
+  selectedRaceMap = mapName;
+  clearWorld();
+  makeTrack(mapName);
+  const names=["You","Ruby","Bolt","Mint","Sunny","Violet","Shadow","Prism"], skins=["red","blue","green","gold","purple","black","rainbow"];
+  for(let i=0;i<8;i++){
+    const r = createRacer("ai"+i,names[i],i===0?selectedSkin:skins[i-1],i===0,(i-3.5)*1.55);
+    r.ai = i!==0; r.s=-i*18; r.speed=i===0?27+save.speed*1.6:26+Math.random()*4;
+  }
+  running=true; paused=false; finished=false; lastRaceGems=0;
+  hideFinishTimer(); show(null); hud(true); clock.getDelta();
+}
+
+function startOnlineRace(mapName){
+  startMusic();
+  selectedRaceMap = mapName;
+  clearWorld();
+  makeTrack(mapName);
+  const arr = currentRoom.players;
+  arr.forEach((p,i)=>createRacer(p.id,p.name,p.skin,p.id===selfId,(i-(arr.length-1)/2)*1.55));
+  running=true; paused=false; finished=false; lastRaceGems=0;
+  hideFinishTimer(); show(null); hud(true); clock.getDelta();
+}
+
+function loopInfo(s){
+  for(const z of loopZones) if(s>=z.startS && s<=z.startS+z.len) return z;
+  return null;
+}
+function loopPosition(r){
+  const z = loopInfo(r.s);
+  if(!z) return null;
+  const t=(r.s-z.startS)/z.len, th=Math.PI*2*t-Math.PI/2, center=sampleAt(z.startS+z.len/2), tan=tangentAt(z.startS), side=sideAt(z.startS);
+  const p=center.clone().add(tan.clone().multiplyScalar(Math.sin(th)*z.radius)).add(new THREE.Vector3(0,Math.cos(th)*z.radius+z.radius+2,0)).add(side.clone().multiplyScalar(r.lane*.38));
+  return {p,z,t};
+}
+
+function collectGems(r){
+  for(const g of gems){
+    if(g.userData.taken) continue;
+    if(Math.abs(r.s-g.userData.s)<28 && g.position.distanceTo(r.group.position)<22){
+      g.userData.taken=true; g.visible=false;
+      if(r.isSelf){
+        r.gems++; save.gems++; lastRaceGems++; saveNow(); tone(880,.05);
+      }
+    }
+  }
+}
+
+function updateOffline(dt){
+  racers.forEach(r=>{
+    if(r.finished) return;
+    r.boost=Math.min(100,r.boost+(10+save.boost)*dt);
+    r.cooldown=Math.max(0,r.cooldown-dt);
+    if(r.isSelf){
+      const steer = (keys.right?1:0) - (keys.left?1:0) + joy.x;
+      const throttle = joy.y<-.1 ? 1.15 : joy.y>.45 ? .55 : 1;
+      r.laneVel += steer*(10.5+save.handling)*dt;
+      r.laneVel *= Math.pow(.82,dt*8);
+      r.lane += r.laneVel*dt;
+      r.speed += 30*throttle*dt;
+      r.speed *= Math.pow(.989,dt*60);
+      r.speed = Math.max(18,Math.min(64+save.speed*2,r.speed));
+    } else {
+      const targetLane = Math.sin(performance.now()/1200+r.id.length+r.s*.002)*trackWidth*.45;
+      r.lane += (targetLane-r.lane)*dt*.55;
+      r.speed += (31-r.speed)*dt*.7;
+      if(Math.random()<.0015 && r.boost>=100) doLocalBoost(r);
+    }
+    if(Math.abs(r.lane)>trackWidth*.92){ r.lane=Math.sign(r.lane)*3.5; r.speed=24; }
+    r.s += r.speed*dt;
+    r.checkpoint = Math.min(14,Math.floor(r.s/totalLen*14));
+    collectGems(r);
+    if(r.s>=totalLen){ r.s=totalLen; r.finished=true; if(r.isSelf) finishRace("Offline race complete!"); }
+  });
+}
+
+function doLocalBoost(r){
+  if(!r || r.boost<100 || r.cooldown>0) return;
+  r.boost=0; r.cooldown=2.2; r.speed += 32+save.speed*2; tone(180,.08,"sawtooth");
+  racers.forEach(o=>{ if(o!==r && Math.abs(o.s-r.s)<48 && Math.abs(o.lane-r.lane)<8){ o.lane+=(o.lane>=r.lane?1:-1)*4.4; o.speed*=.6; } });
+}
+
+function handleRemoteGem(d){
+  const r = racers.find(x=>x.id===d.playerId);
+  if(r) r.gems = d.gems;
+  if(player && d.playerId===player.id && d.gems > (player.gems||0)){
+    const add=d.gems-(player.gems||0);
+    save.gems+=add; lastRaceGems+=add; saveNow();
+  }
+  gems.forEach(g=>{
+    if(g.userData.gemIndex===d.gemIndex){ g.userData.taken=true; g.visible=false; }
+  });
+}
+
+function applyOnlineState(state){
+  if(state.finishSecondsLeft && state.finishSecondsLeft>0) showFinishTimer(state.finishSecondsLeft,"Leader");
+  state.players.forEach(sp=>{
+    let r=racers.find(x=>x.id===sp.id);
+    if(!r) r=createRacer(sp.id,sp.name,sp.skin,sp.id===selfId,sp.lane);
+    Object.assign(r,{s:sp.s,lane:sp.lane,speed:sp.speed,boost:sp.boost,cooldown:sp.cooldown,gems:sp.gems||0,finished:sp.finished,place:sp.place,checkpoint:sp.checkpoint});
+  });
+}
+
+function finishRace(msg){
+  finished=true; running=false;
+  const board=[...racers].sort((a,b)=>b.s-a.s);
+  $("result").innerHTML = msg+"<br><br><b>Results</b><br>"+board.map((r,i)=>`#${i+1} ${r.name} · Gems ${r.gems||0} · ${Math.min(100,Math.floor(r.s/totalLen*100))}%`).join("<br>");
+  $("finishGems").textContent = lastRaceGems;
+  show("finishScreen");
+}
+
+function placeRacers(dt){
+  racers.forEach(r=>{
+    const base=sampleAt(Math.max(0,Math.min(totalLen,r.s))), side=sideAt(r.s), tan=tangentAt(r.s), lp=loopPosition(r);
+    let pos;
+    if(lp){ pos=lp.p; r.group.lookAt(pos.clone().add(tan)); }
+    else { pos=base.clone().add(side.multiplyScalar(r.lane)); pos.y+=4.4; r.group.lookAt(pos.clone().add(tan)); }
+    r.group.position.copy(pos);
+    r.ball.rotation.x += dt*r.speed*.13;
+    r.label.lookAt(camera.position);
+  });
+}
+
+function sendInput(){
+  if(selectedMode!=="online" || !socket || !running) return;
+  const now=performance.now();
+  if(now-lastSent<50) return;
+  lastSent=now;
+  const steer = Math.max(-1,Math.min(1,(keys.right?1:0)-(keys.left?1:0)+joy.x));
+  const throttle = joy.y<-.1 ? 1.15 : joy.y>.45 ? .55 : 1;
+  socket.emit("input",{steer,throttle,boost:pendingBoost});
+  pendingBoost=false;
+}
+
+function updateCamera(dt){
+  if(!player) return;
+  const p=player.group.position.clone(), tan=tangentAt(player.s), side=sideAt(player.s), z=loopInfo(player.s);
+  let desired;
+  if(z){
+    const center=sampleAt(z.startS+z.len/2);
+    desired=center.clone().add(side.clone().multiplyScalar(-92)).add(new THREE.Vector3(0,76,0)).add(tan.clone().multiplyScalar(-58));
+    camera.position.lerp(desired,1-Math.pow(.00016,dt));
+    camera.lookAt(center.clone().add(new THREE.Vector3(0,z.radius*1.05,0)));
+  } else {
+    desired=p.clone().add(tan.clone().multiplyScalar(-44)).add(side.clone().multiplyScalar(-player.lane*.08)).add(new THREE.Vector3(0,26,0));
+    camera.position.lerp(desired,1-Math.pow(.00015,dt));
+    camera.lookAt(p.clone().add(tan.clone().multiplyScalar(44)).add(new THREE.Vector3(0,6,0)));
+  }
+}
+
+function updateHUD(){
+  if(!player) return;
+  const board=[...racers].sort((a,b)=>b.s-a.s), place=board.indexOf(player)+1;
+  $("place").textContent=`Place: ${place}/${racers.length}`;
+  $("progress").textContent=`Progress: ${Math.min(100,Math.floor(player.s/totalLen*100))}%`;
+  $("speed").textContent=`Speed: ${Math.floor(player.speed||0)}`;
+  $("boostText").textContent=`Boost: ${Math.floor(player.boost||0)}%`;
+  $("gemsText").textContent=`Gems: ${player.gems||0}`;
+  $("checkpoint").textContent=`CP: ${Math.min(14,Math.floor(player.s/totalLen*14))}/14`;
+  $("leaderboard").innerHTML=board.map((r,i)=>`${i+1}. ${r.name} · CP ${Math.min(14,Math.floor(r.s/totalLen*14))} · ${Math.min(100,Math.floor(r.s/totalLen*100))}%`).join("<br>");
+  $("boostBtn").classList.toggle("cooling",!(player.boost>=100 && player.cooldown<=0));
+}
+
+function startMusic(){
+  if(audio || !music) return;
+  try{
+    const ctx=new (AudioContext||webkitAudioContext)(), gain=ctx.createGain();
+    gain.gain.value=.06*volume; gain.connect(ctx.destination);
+    audio={ctx,gain};
+  }catch(e){}
+}
+function tone(f,d,type="sine"){
+  if(!music) return; startMusic(); if(!audio) return;
+  const o=audio.ctx.createOscillator(), g=audio.ctx.createGain();
+  o.type=type; o.frequency.value=f; g.gain.value=.05*volume;
+  o.connect(g); g.connect(audio.gain); o.start();
+  g.gain.exponentialRampToValueAtTime(.001,audio.ctx.currentTime+d);
+  o.stop(audio.ctx.currentTime+d);
+}
+function musicTick(dt){
+  if(!music || !audio) return;
+  beat+=dt;
+  if(beat>.32){ beat=0; tone(130+Math.random()*120,.04,Math.random()>.5?"square":"sine"); }
+}
+
+function animate(){
+  requestAnimationFrame(animate);
+  const dt=Math.min(clock?clock.getDelta():.016,.033);
+  musicTick(dt);
+  if(running && !paused){
+    if(selectedMode==="offline") updateOffline(dt);
+    sendInput();
+    placeRacers(dt);
+    updateCamera(dt);
+    updateHUD();
+  }
+  gems.forEach(g=>{ if(g.visible) g.rotation.y+=dt*2.4; });
+  if(worldGroup) worldGroup.children.forEach(o=>{
+    if(o.userData.snow){ o.position.y-=dt*12; if(o.position.y<-5) o.position.y=120; }
+    if(o.userData.lava){ o.position.y=3+Math.abs(Math.sin(performance.now()/500+o.position.x))*12; }
+  });
+  renderer.render(scene,camera);
+}
+
+addEventListener("keydown",e=>{
+  const k=e.key.toLowerCase();
+  if(k===" ") selectedMode==="online" ? pendingBoost=true : doLocalBoost(player);
+  if(k==="arrowleft"||k==="a") keys.left=true;
+  if(k==="arrowright"||k==="d") keys.right=true;
+});
+addEventListener("keyup",e=>{
+  const k=e.key.toLowerCase();
+  if(k==="arrowleft"||k==="a") keys.left=false;
+  if(k==="arrowright"||k==="d") keys.right=false;
+});
+$("boostBtn").onclick=()=> selectedMode==="online" ? pendingBoost=true : doLocalBoost(player);
+
+const joyEl=$("joy"), stick=$("stick");
+let joyActive=false, joyRect;
+function setJoy(e){
+  let rawX=e.clientX-(joyRect.left+joyRect.width/2), rawY=e.clientY-(joyRect.top+joyRect.height/2);
+  const r=joyRect.width*.38, d=Math.hypot(rawX,rawY);
+  let x=rawX, y=rawY;
+  if(d>r){ x=x/d*r; y=y/d*r; }
+  joy.x=x/r; joy.y=y/r;
+  stick.style.transform=`translate(calc(-50% + ${x}px),calc(-50% + ${y}px))`;
+}
+joyEl.addEventListener("pointerdown",e=>{ joyActive=true; joyRect=joyEl.getBoundingClientRect(); joyEl.setPointerCapture(e.pointerId); setJoy(e); startMusic(); });
+joyEl.addEventListener("pointermove",e=>{ if(joyActive) setJoy(e); });
+function resetJoy(){ joyActive=false; joy.x=0; joy.y=0; stick.style.transform="translate(-50%,-50%)"; }
+joyEl.addEventListener("pointerup",resetJoy);
+joyEl.addEventListener("pointercancel",resetJoy);
+
+try{
+  renderSwatches();
+  renderMaps();
+  setTimeout(()=>{ init3D(); }, 150);
+}catch(err){
+  console.error(err);
+  $("loadMsg").textContent = "Game error: " + err.message;
+}
+})();
 </script>
 </body>
 </html>

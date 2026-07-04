@@ -1,6 +1,6 @@
-# Marble League 3D — Fixed Race Systems
+# Marble League 3D — Render HTML Rebuild
 
-Flat Render/GitHub files:
+Flat Render/GitHub format:
 
 - README.md
 - index.html
@@ -8,19 +8,49 @@ Flat Render/GitHub files:
 - render.yaml
 - server.js
 
-## Fixed in this build
+## What this rebuild fixes
 
-- 15-second finish timer triggers when first player reaches the end.
-- Timer shows at top middle during multiplayer finish countdown.
-- After timer expires, final placements/results show.
-- Race end menu includes Race Again, Pick New Map, Shop, and Home.
-- Leaving a game does not create a new room.
-- Host leaving ends the room cleanly.
-- Open lobbies only show waiting rooms and never show your own room.
-- Joystick steering fixed: swipe/press left moves left, right moves right.
-- Multiplayer gems disappear locally when collected and update immediately.
-- Server still syncs multiplayer gem count.
-- Wider track for more players.
-- Loop camera pulls back farther and frames the whole loop.
-- Themes now generate stronger local scenery: snow, lava, beach, lake, desert, jungle, candy, city, etc.
-- Skins have more distinct materials and effects.
+- Single HTML game client, still Render-ready.
+- No loading freeze: the engine catches errors and shows them.
+- Real Socket.IO multiplayer rooms.
+- Host does not see their own lobby in open lobby list.
+- Started games disappear from open lobby list.
+- Create/join first, then host opens map voting.
+- If players choose different maps, a wheel spins.
+- If everyone chooses the same map, the race starts directly.
+- Multiplayer gems collect, disappear, and sync immediately.
+- First finisher starts a 15-second timer.
+- Final results show placements, progress, and gems.
+- Finish menu: Race Again, Pick New Map, Shop, Home / End Room.
+- Joystick: left moves left, right moves right.
+- Wider tracks for multiplayer.
+- 20 map names with unique visual themes.
+- 20+ ball skins with unlock shop.
+- Sonic-style loop camera pulls back and returns.
+
+## Local run
+
+```bash
+npm install
+npm start
+```
+
+Open:
+
+```text
+http://localhost:3000
+```
+
+## Render
+
+Build command:
+
+```bash
+npm install
+```
+
+Start command:
+
+```bash
+npm start
+```
