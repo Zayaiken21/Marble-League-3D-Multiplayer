@@ -1,6 +1,6 @@
-# Marble League 3D — Sonic Inside Loop Fixed
+# Marble League 3D — Professional Final
 
-Flat Render/GitHub format:
+Flat Render/GitHub files:
 
 - README.md
 - index.html
@@ -8,17 +8,18 @@ Flat Render/GitHub format:
 - render.yaml
 - server.js
 
-## Fixed
+## Final fixes
 
-- Marbles ride the inside of visible Sonic-style loop rings.
-- Camera pulls back during loops so the loop is visible.
-- Camera returns to normal after the loop.
-- Track pieces are cleaner and do not visually crash through each other as badly.
+- Every loop uses one consistent Sonic-style inside-loop system.
+- The ball visibly rides inside the loop.
+- Loop camera pulls back but stays readable on phone screens.
+- Camera returns smoothly after loops.
 - Joystick left/right corrected.
-- Wider visible track surface with rails, gems, glow, and nameplates.
-- Keeps multiplayer lobby, ready sync, map voting, and map wheel flow.
+- Finish screen includes Race Again, Pick New Map, and Home.
+- Going Home leaves the multiplayer room; if host goes Home, the room ends.
+- Multiplayer still supports lobby join, ready sync, map vote, and wheel only when maps differ.
 
-## Deploy on Render
+## Render
 
 Build command:
 

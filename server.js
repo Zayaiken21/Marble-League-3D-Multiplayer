@@ -363,6 +363,27 @@ io.on("connection", socket => {
     };
   });
 
+
+  socket.on("leaveRoom", () => {
+    const room = rooms.get(socket.data.roomCode);
+    if (!room) return;
+    const wasHost = room.players.get(socket.id)?.host;
+    const code = room.code;
+
+    if (wasHost) {
+      io.to(code).emit("roomClosed", "Host ended the room.");
+      rooms.delete(code);
+      io.socketsLeave(code);
+    } else {
+      room.players.delete(socket.id);
+      socket.leave(code);
+      socket.data.roomCode = null;
+      emitRoom(room);
+    }
+
+    io.emit("lobbyList", lobbyList());
+  });
+
   socket.on("disconnect", () => {
     const room = rooms.get(socket.data.roomCode);
     if (!room) return;

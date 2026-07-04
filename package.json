@@ -1,7 +1,7 @@
 {
-  "name": "marble-league-3d-sonic-inside-loop-fixed",
-  "version": "2.1.0",
-  "description": "Render-ready 3D marble racing with visible Sonic-style inside loops and corrected joystick",
+  "name": "marble-league-3d-professional-final",
+  "version": "2.2.0",
+  "description": "Final professional Render-ready marble racing game with fixed loops, controls, finish flow, and room ending",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
