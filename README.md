@@ -1,6 +1,6 @@
-# Marble League 3D — Multiplayer Flow Fixed
+# Marble League 3D — Perfected Render Version
 
-Flat Render/GitHub format:
+Flat GitHub/Render format:
 
 - README.md
 - index.html
@@ -8,17 +8,25 @@ Flat Render/GitHub format:
 - render.yaml
 - server.js
 
-## Fixed multiplayer flow
+## Flow
 
-1. Players create/join lobby first.
-2. No map is picked before the lobby.
-3. Host opens map voting after players are in.
-4. Every player picks a map.
-5. Every player readies up.
-6. Host spins the wheel.
-7. Wheel chooses from player-selected maps.
-8. Game loads the chosen map for everyone.
-9. Race starts with synced players.
+### Main Menu
+Choose Offline or Multiplayer first.
+
+### Offline
+Pick map after choosing Offline. Race AI, collect gems, and use gems in the shop for upgrades/designs.
+
+### Multiplayer
+Create or join a lobby first. No map voting appears until you are inside a lobby and the host opens map voting.
+
+Multiplayer flow:
+1. Create/join lobby.
+2. Host opens map voting.
+3. Everyone chooses a map.
+4. Everyone readies up.
+5. If all maps are the same, the game starts directly.
+6. If maps are different, the wheel spins through selected maps and lands upright on the chosen map.
+7. Race starts synced.
 
 ## Render
 
